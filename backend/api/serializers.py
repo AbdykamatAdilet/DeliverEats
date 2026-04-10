@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Address
+from .models import Address, CartItem
+from django.contrib.auth.models import User
 
 ## c. Serializer for Checkout and Address
 class CheckoutSerializer(serializers.Serializer):
@@ -29,5 +30,27 @@ class AddressSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+    
+class CartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = '__all__'
+        read_only_fields = ['user']
 
+# 2-й модельный сериализатор: для регистрации пользователя
+class UserRegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
 
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+
+    def create(self, validated_data):
+        # Используем create_user, чтобы пароль захешировался
+        user = User.objects.create_user(**validated_data)
+        return user
+
+# 2-й обычный сериализатор: для смены пароля или логина
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)

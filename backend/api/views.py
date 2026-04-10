@@ -73,6 +73,19 @@ def set_default_address(request, pk):
         status=status.HTTP_200_OK
     )
 
+#Вот здесь я (Адилет) добавил функцию для получения профиля пользователя, 
+# которая возвращает его имя, email и дату регистрации. 
+# Это может быть полезно для отображения информации о пользователе в его профиле или для других целей в приложении.
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_profile(request):
+    user = request.user
+    return Response({
+        'username': user.username,
+        'email': user.email,
+        'date_joined': user.date_joined
+    })
+
 #Function-based view for processing checkout
 #Temporarily disabled until Cart and Order models are implemented, it is giving errors
 '''@api_view(['POST'])

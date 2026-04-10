@@ -38,3 +38,15 @@ class Address(models.Model):
 
     def __str__(self):
             return f"{self.user.username} - {self.street}, {self.building}, {self.apartment}"
+    
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+class CartItem(models.Model):
+    user = models.ForeignKey(User, on_express=models.CASCADE) # Связь с пользователем
+    product_name = models.CharField(max_length=255)
+    price = models.FloatField()
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.product_name} for {self.user.username}"
