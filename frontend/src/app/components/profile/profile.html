@@ -1,0 +1,19 @@
+<div style="padding: 20px; border: 1px solid #ccc; margin-top: 20px;">
+  <h2>User Profile Page</h2>
+
+  @if (user) {
+    <div class="info-box">
+      <p><strong>Username:</strong> {{ user.username }}</p>
+      <p><strong>Email:</strong> {{ user.email || 'No email' }}</p>
+      <p><strong>Joined:</strong> {{ user.date_joined | date }}</p>
+    </div>
+  } @else {
+    <div class="loader">
+      <p>Waiting for data from server...</p>
+    </div>
+  }
+
+  <hr>
+  <h4>Debug Info:</h4>
+  <pre>{{ user | json }}</pre>
+</div>

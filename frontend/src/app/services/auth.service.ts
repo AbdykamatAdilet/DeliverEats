@@ -25,6 +25,10 @@ export class AuthService {
     return this.http.get(`${this.apiUrl}/profile/`);
   }
 
+  getUserProfile(): Observable<any> {
+    return this.http.get('http://127.0.0.1:8000/api/profile/');
+  }
+
   logout() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');

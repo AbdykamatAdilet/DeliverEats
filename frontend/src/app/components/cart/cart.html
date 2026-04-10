@@ -1,0 +1,33 @@
+<p>cart works!</p>
+<div class="cart-container">
+  <h2>🛒 Shopping Cart</h2>
+
+  @if (cartItems.length > 0) {
+    <div class="cart-items-list">
+      @for (item of cartItems; track item.id) {
+        <div class="cart-item-card">
+          <div class="info">
+            <h4>{{ item.menu_item.name }}</h4>
+            <p>{{ item.quantity }} x {{ item.menu_item.price }} KZT</p>
+          </div>
+          <button class="btn-remove" (click)="removeItem(item.id)">Remove</button>
+        </div>
+      }
+    </div>
+
+    <div class="cart-summary">
+      <hr>
+      <h3>Total: {{ totalAmount }} KZT</h3>
+      <div class="actions">
+        <button class="btn-clear" (click)="clearCart()">Clear Cart</button>
+        <button class="btn-checkout" (click)="confirmOrder()">Checkout</button>
+      </div>
+    </div>
+
+  } @else {
+    <div class="empty-message">
+      <p>Your cart is empty. Time to order some delicious food!</p>
+      <button class="btn-menu" routerLink="/menu">Go to Menu</button>
+    </div>
+  }
+</div>
