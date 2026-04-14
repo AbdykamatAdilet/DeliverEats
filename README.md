@@ -10,7 +10,6 @@
 2. **Nurzhankyzy Assem** 
 3. **Otarbayev Akzhan** 
 
-**Practice Teacher:** [Teacher's Name]  
 **Project Name:** DeliverEats  
 
 --- 
