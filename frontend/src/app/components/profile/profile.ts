@@ -18,13 +18,13 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.authService.getUserProfile().subscribe({
-      next: (data) => {
+    this.authService.getProfile().subscribe({
+      next: (data: any) => {
         console.log('Final Check - Data from API:', data);
         this.user = data; 
         this.cdr.detectChanges(); 
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('API Error:', err);
       }
     });

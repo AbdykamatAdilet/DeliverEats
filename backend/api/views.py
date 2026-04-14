@@ -1,3 +1,5 @@
+from urllib import request
+
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -6,6 +8,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import Address
 from .serializers import AddressSerializer, CheckoutSerializer
+from .models import Cart, CartItem, MenuItem, Order, OrderItem
+from .serializers import CartItemSerializer
 
 class AddressListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -13,7 +17,17 @@ class AddressListCreateAPIView(APIView):
     def get(self, request):
         addresses = Address.objects.filter(user=request.user)
         serializer = AddressSerializer(addresses, many=True)
-        return Response({ 'addresses': serializer.data, 'default_address': next((a for a in serializer.data if a['is_default']), None) })
+
+        default_address = None
+        for addr in serializer.data:
+            if addr['is_default']:
+                default_address = addr
+                break
+
+        return Response({
+            'addresses': serializer.data,
+            'default_address': default_address
+        }, status=status.HTTP_200_OK)
     
     def post(self, request):
         serializer = AddressSerializer(data=request.data, context={'request': request})
@@ -48,6 +62,33 @@ class AddressDetailAPIView(APIView):
             {'message': 'Address deleted successfully'}, 
             status=status.HTTP_204_NO_CONTENT
         )
+    
+class CartAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        items = cart.items.all()
+        serializer = CartItemSerializer(items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        cart, created = Cart.objects.get_or_create(user=request.user)
+
+        menu_item_id = request.data.get('menu_item')
+        quantity = request.data.get('quantity', 1)
+
+        menu_item = get_object_or_404(MenuItem, id=menu_item_id)
+
+        item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            menu_item=menu_item
+        )
+
+        item.quantity += int(quantity)
+        item.save()
+
+        return Response({'message': 'Item added to cart'}, status=status.HTTP_201_CREATED)
     
 #Function-based view for setting default address
 @api_view(['PATCH'])  
@@ -86,57 +127,45 @@ def get_user_profile(request):
         'date_joined': user.date_joined
     })
 
-#Function-based view for processing checkout
-#Temporarily disabled until Cart and Order models are implemented, it is giving errors
-'''@api_view(['POST'])
+@api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def process_checkout(request):
+def remove_from_cart(request, pk):
+    cart = get_object_or_404(Cart, user=request.user)
+    item = get_object_or_404(CartItem, pk=pk, cart=cart)
+
+    item.delete()
+    return Response({'message': 'Item removed'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def checkout(request):
     serializer = CheckoutSerializer(data=request.data, context={'request': request})
 
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # Get cart; provided by Adilet
-    try:
-        cart = Cart.objects.get(user=request.user)
-    except Cart.DoesNotExist:
-        return Response(
-            {'error': 'Cart not found.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    cart = get_object_or_404(Cart, user=request.user)
+    items = cart.items.all()
 
-    cart_items = cart.items.select_related('menu_item').all()
-    if not cart_items.exists():
-        return Response(
-            {'error': 'Your cart is empty. Add items before checking out.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    data= serializer.validated_data
-    address = get_object_or_404(Address, id=data['address_id'], user=request.user)
-    total_price = sum(item.menu_item.price * item.quantity for item in cart_items)   
-    
-    #Akzhan's block, update then pls
+    if not items:
+        return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
+
+    total = sum(item.menu_item.price * item.quantity for item in items)
+
     order = Order.objects.create(
         user=request.user,
-        delivery_street=address.street,
-        delivery_building=address.building,
-        delivery_apartment=address.apartment or '',
-        special_instructions=serializer.validated_data.get('special_instructions', ''),
-        payment_method=serializer.validated_data['payment_method'],
-        total_amount=total_price,
-        status='pending'
+        total_amount=total,
+        delivery_address="Some address",
     )
-        
-    for cart_item in cart_items:
-        order.items.create(
-            menu_item=cart_item.menu_item,
-            quantity=cart_item.quantity,
-            price_at_time=cart_item.menu_item.price
-        )
-    cart_items.delete()
 
-    return Response({'message':'Order placed successfully',
-                         'order_id': order.id,
-                         'status': order.status,
-                         'estimated_delivery': '30-45 minutes',
-                         }, status=status.HTTP_201_CREATED)  '''
+    for item in items:
+        OrderItem.objects.create(
+            order=order,
+            menu_item=item.menu_item,
+            quantity=item.quantity,
+            price_at_time=item.menu_item.price
+        )
+
+    items.delete()
+
+    return Response({'message': 'Order created'}, status=status.HTTP_201_CREATED)

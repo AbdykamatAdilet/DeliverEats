@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,20 +13,33 @@ export class AuthService {
   login(credentials: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/login/`, credentials).pipe(
       tap((response: any) => {
-        if (response.access) {
-          localStorage.setItem('access_token', response.access);
-          localStorage.setItem('refresh_token', response.refresh);
+        console.log('Server response:', response);
+
+        if (response && (response.access || response.token)) {
+          const token = response.access || response.token;
+
+          localStorage.setItem('access_token', token);
+          localStorage.setItem('refresh_token', response.refresh || '');
+
+          console.log('Token saved successfully');
+        } else {
+          console.warn('Token not found in response');
         }
+      }),
+      catchError((error) => {
+        console.error('Login error:', error);
+        return throwError(() => error);
       })
     );
   }
 
   getProfile(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/profile/`);
-  }
-
-  getUserProfile(): Observable<any> {
-    return this.http.get('http://127.0.0.1:8000/api/profile/');
+    return this.http.get(`${this.apiUrl}/profile/`).pipe(
+      catchError((error) => {
+        console.error('Profile fetch error:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   logout() {
