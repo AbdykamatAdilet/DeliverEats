@@ -14,6 +14,7 @@ export class Home{
   categories = [
     { id: 'breakfast', name: 'Завтраки' },
     { id: 'hot', name: 'Горячие блюда' },
+    { id: 'soup', name: 'Супы' },
     { id: 'salads', name: 'Салаты' },
     { id: 'sideDish', name: 'Гарниры' },
     { id: 'dessert', name: 'Десерты' },
@@ -37,6 +38,13 @@ export class Home{
     { name: 'Курица в белом соусе', price: 2250, category: 'hot' },
     { name: 'Гуляш из говядины', price: 2150, category: 'hot' },
     { name: 'Жареная рыба', price: 2400, category: 'hot' },
+
+    { name: 'Борщ с капусткой но не красный', price: 1000, category: 'soup' },
+    { name: 'Рассольник', price: 800, category: 'soup' },
+    { name: 'Солянка', price: 1200, category: 'soup' },
+    { name: 'Гороховый суп', price: 900, category: 'soup' },
+    { name: 'Кеспе', price: 800, category: 'soup' },
+    { name: 'Шурпа из баранины', price: 1500, category: 'soup' },
   
     { name: 'Цезарь', price: 1250, category: 'salads' },
     { name: 'Греческий', price: 1250, category: 'salads' },
@@ -60,13 +68,14 @@ export class Home{
     { name: 'Напалеон', price: 1350, category: 'dessert' },  
     { name: 'Пончик', price: 1000, category: 'dessert' },  
 
-    { name: 'Coca Cola 1l', price: 1000, category: 'drinks' }, 
-    { name: 'Sprite 1l', price: 900, category: 'drinks' },  
-    { name: 'Fuse 0.5l', price: 600, category: 'drinks' },  
-    { name: 'Сок Piko 1l', price: 1250, category: 'drinks' },  
-    { name: 'Вода 0.5l', price: 500, category: 'drinks' },  
-    { name: 'Компот 1l', price: 950, category: 'drinks' },  
+    { name: 'Coca Cola 1L', price: 1000, category: 'drinks' }, 
+    { name: 'Sprite 1L', price: 900, category: 'drinks' },  
+    { name: 'Fuse 0.5L', price: 600, category: 'drinks' },  
+    { name: 'Сок Piko 1L', price: 1250, category: 'drinks' },  
+    { name: 'Вода 0.5L', price: 500, category: 'drinks' },  
+    { name: 'Компот 1L', price: 950, category: 'drinks' },  
   ];
+  
   cart: any[] = [];
   activeCategory = '';
 
@@ -74,32 +83,67 @@ setActive(catId: string) {
   this.activeCategory = catId;
   this.scrollToCategory(catId);
 }
-  //фильтр поиска
+
   get filteredItems() {
     return this.menuItems.filter(item =>
       item.name.toLowerCase().includes(this.searchText.toLowerCase())
     );
   }
-
-  // 🛒 Добавление в корзину
+  
   addToCart(item: any) {
-    this.cart.push(item);
+    const existingItem = this.cart.find(i => i.name === item.name);
+  
+    if (existingItem) {
+      existingItem.quantity++;
+    } else {
+      this.cart.push({ ...item, quantity: 1 });
+    }
   }
+  address: string = '';
+isEditingAddress: boolean = false;
 
-  // 💰 Общая сумма
+ngOnInit() {
+  const savedAddress = localStorage.getItem('address');
+  if (savedAddress) {
+    this.address = savedAddress;
+  }
+}
+
+saveAddress() {
+  if (this.address.trim()) {
+    localStorage.setItem('address', this.address);
+    this.isEditingAddress = false;
+  }
+}
+
+editAddress() {
+  this.isEditingAddress = true;
+}
   get totalPrice() {
-    return this.cart.reduce((sum, item) => sum + item.price, 0);
+    return this.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }
 
-  // 🚀 Скролл к категории
   scrollToCategory(categoryId: string) {
     const el = document.getElementById(categoryId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   }
-
-  // 📦 Оформление заказа
+  
+  remove(item: any) {
+    this.cart = this.cart.filter(i => i !== item);
+  }
+  increase(item: any) {
+    item.quantity++;
+  }
+  
+  decrease(item: any) {
+    if (item.quantity > 1) {
+      item.quantity--;
+    } else {
+      this.remove(item);
+    }
+  }
   checkout() {
     alert('Заказ оформлен на сумму ' + this.totalPrice + ' ₸');
     this.cart = [];

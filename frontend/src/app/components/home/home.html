@@ -7,14 +7,32 @@
             (click)="scrollToCategory(cat.id)">
       {{ cat.name }}
     </button>
+       <!-- Адрес кнопка-->
   </div>
+  <div class="address-block">
 
-  <!-- ЦЕНТР (МЕНЮ) -->
+    <div *ngIf="address && !isEditingAddress">
+      📍 {{ address }}
+      <button (click)="editAddress()">Изменить</button>
+    </div>
+  
+    <div *ngIf="isEditingAddress">
+      <input [(ngModel)]="address" placeholder="Введите адрес" />
+      <button (click)="saveAddress()">Сохранить</button>
+    </div>
+  
+
+    <div *ngIf="!address && !isEditingAddress">
+      <button (click)="editAddress()">Указать адрес</button>
+    </div>
+  
+  </div>
+  <!-- ЦЕНТР -->
   <div class="content">
 
     <h2>Меню</h2>
 
-    <!-- 🔍 Поиск -->
+    <!--  Поиск -->
     <input [(ngModel)]="searchText" placeholder="Поиск..." />
 
     <!-- Категории -->
@@ -45,15 +63,26 @@
   <!-- ПРАВАЯ ЧАСТЬ (КОРЗИНА) -->
   <div class="cart">
 
-    <h3>Корзина</h3>
+    <div *ngFor="let item of cart" class="cart-item">
 
-    <div *ngFor="let item of cart">
-      {{ item.name }} - {{ item.price }} ₸
+      <p>{{ item.name }}</p>
+    
+      <p>{{ item.price }} ₸</p>
+    
+      <div>
+        <button (click)="decrease(item)">-</button>
+        {{ item.quantity }}
+        <button (click)="increase(item)">+</button>
+      </div>
+    
+      <button (click)="remove(item)">❌</button>
+    
     </div>
-
+    
     <hr>
-
+    
     <p><b>Итого: {{ totalPrice }} ₸</b></p>
+    <hr>
 
     <button (click)="checkout()">
       Оформить заказ
