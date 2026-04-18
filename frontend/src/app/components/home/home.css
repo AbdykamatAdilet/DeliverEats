@@ -1,0 +1,72 @@
+.menu {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 20px;
+  }
+  
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    background: white;
+  }
+  
+  button {
+    background: orange;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .container {
+    display: flex;
+  }
+  
+  /* ЛЕВО */
+  .sidebar {
+    width: 200px;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  
+  .sidebar button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+  
+  /* ЦЕНТР */
+  .content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .menu {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+  }
+  
+  .card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  .cart {
+    width: 250px;
+    padding: 10px;
+    border-left: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .active {
+    background: orange;
+    color: white;
+  }

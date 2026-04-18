@@ -1,0 +1,64 @@
+<div class="container">
+
+  <!-- ЛЕВОЕ МЕНЮ -->
+  <div class="sidebar">
+    <h3>Категории</h3>
+    <button *ngFor="let cat of categories"
+            (click)="scrollToCategory(cat.id)">
+      {{ cat.name }}
+    </button>
+  </div>
+
+  <!-- ЦЕНТР (МЕНЮ) -->
+  <div class="content">
+
+    <h2>Меню</h2>
+
+    <!-- 🔍 Поиск -->
+    <input [(ngModel)]="searchText" placeholder="Поиск..." />
+
+    <!-- Категории -->
+    <div *ngFor="let cat of categories">
+
+      <h2 [id]="cat.id">{{ cat.name }}</h2>
+
+      <div class="menu">
+
+        <div class="card"
+             *ngFor="let item of filteredItems"
+             [hidden]="item.category !== cat.id">
+
+          <h3>{{ item.name }}</h3>
+          <p>{{ item.price }} ₸</p>
+
+          <button (click)="addToCart(item)">
+            Добавить
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ПРАВАЯ ЧАСТЬ (КОРЗИНА) -->
+  <div class="cart">
+
+    <h3>Корзина</h3>
+
+    <div *ngFor="let item of cart">
+      {{ item.name }} - {{ item.price }} ₸
+    </div>
+
+    <hr>
+
+    <p><b>Итого: {{ totalPrice }} ₸</b></p>
+
+    <button (click)="checkout()">
+      Оформить заказ
+    </button>
+
+  </div>
+
+</div>
