@@ -1,6 +1,11 @@
-<nav>
-  <h1>DeliverEats</h1>
-  <button (click)="logout()">Выйти</button>
-</nav>
+<!-- <nav>
+<h1>DeliverEats</h1>
+<button (click)="logout()">Выйти</button>
+</nav> -->
 
-<router-outlet />
+<app-top-bar></app-top-bar>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+<app-error-message></app-error-message>

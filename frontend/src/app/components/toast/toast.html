@@ -1,0 +1,8 @@
+<div *ngIf="message && message.message" 
+     class="toast-notification" 
+     [class]="message.type"
+     (click)="close()">
+  <span class="toast-icon">{{ getIcon() }}</span>
+  <span class="toast-message">{{ message.message }}</span>
+  <button class="toast-close">&times;</button>
+</div>

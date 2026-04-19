@@ -1,5 +1,3 @@
-from urllib import request
-
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -138,34 +136,56 @@ def remove_from_cart(request, pk):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def checkout(request):
+def process_checkout(request):
     serializer = CheckoutSerializer(data=request.data, context={'request': request})
 
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     cart = get_object_or_404(Cart, user=request.user)
-    items = cart.items.all()
+    cart_items = cart.items.select_related('menu_item').all()
 
-    if not items:
-        return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
+    if not cart_items.exists():
+        return Response(
+            {'error': 'Your cart is empty.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
-    total = sum(item.menu_item.price * item.quantity for item in items)
+    data = serializer.validated_data
+    address = get_object_or_404(Address, id=data['address_id'], user=request.user)
+    total = sum(item.menu_item.price * item.quantity for item in cart_items)
+
+    address_parts = [address.street]
+    if address.building:
+        address_parts.append(address.building)
+    if address.apartment:
+        address_parts.append(f"Apt {address.apartment}")
+    delivery_address_str = ", ".join(address_parts)
 
     order = Order.objects.create(
         user=request.user,
         total_amount=total,
-        delivery_address="Some address",
+        delivery_address=delivery_address_str,
+        payment_method=data['payment_method'],
+        status='pending',
     )
 
-    for item in items:
-        OrderItem.objects.create(
+    OrderItem.objects.bulk_create([
+        OrderItem(
             order=order,
             menu_item=item.menu_item,
             quantity=item.quantity,
-            price_at_time=item.menu_item.price
+            price_at_time=item.menu_item.price,
         )
+        for item in cart_items
+    ])
 
-    items.delete()
+    cart_items.delete()
 
-    return Response({'message': 'Order created'}, status=status.HTTP_201_CREATED)
+    return Response({
+        'message': 'Order placed successfully!',
+        'order_id': order.id,
+        'status': order.status,
+        'total_amount': str(order.total_amount),
+        'estimated_delivery': '30-45 minutes',
+    }, status=status.HTTP_201_CREATED)

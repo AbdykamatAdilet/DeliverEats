@@ -1,49 +1,104 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { CartService } from '../../services/cart.service';
+import { ErrorHandlerService } from '../../services/error-handler.service';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './cart.html',
-  styleUrl: './cart.css'
+  styleUrls: ['./cart.css']
 })
-
 export class CartComponent implements OnInit {
   cartItems: any[] = [];
   totalAmount: number = 0;
+  deliveryFee: number = 500;
+  isLoading: boolean = false;
 
-  constructor(private cartService: CartService) {}
+  constructor(
+    private cartService: CartService,
+    private errorHandlerService: ErrorHandlerService
+  ) {}
 
   ngOnInit() {
     this.loadCart();
   }
 
   loadCart() {
+    this.isLoading = true;
     this.cartService.getCartItems().subscribe({
       next: (data) => {
         this.cartItems = data;
         this.calculateTotal();
+        this.isLoading = false;
       },
-      error: (err) => console.error('Ошибка загрузки корзины', err)
+      error: (err) => {
+        console.error('Error loading cart', err);
+        this.isLoading = false;
+      }
     });
   }
 
   calculateTotal() {
-    this.totalAmount = this.cartItems.reduce((acc, item) => acc + (item.menu_item.price * item.quantity), 0);
+    this.totalAmount = this.cartItems.reduce((acc, item) => {
+      const price = item.menu_item?.price || 0;
+      const quantity = item.quantity || 0;
+      return acc + (price * quantity);
+    }, 0);
+  }
+
+  updateQuantity(item: any, change: number) {
+    const newQuantity = item.quantity + change;
+    if (newQuantity < 1) {
+      this.removeItem(item.id);
+      return;
+    }
+    
+    item.quantity = newQuantity;
+    this.calculateTotal();
+    console.log('Quantity updated');
   }
 
   removeItem(id: number) {
-    this.cartService.removeItem(id).subscribe(() => this.loadCart());
+    if (confirm('Remove this item from cart?')) {
+      this.cartService.removeItem(id).subscribe({
+        next: () => {
+          this.loadCart();
+          console.log('Item removed');
+        },
+        error: () => {
+          console.error('Failed to remove item');
+        }
+      });
+    }
   }
 
   clearCart() {
-    this.cartService.clearCart().subscribe(() => this.loadCart());
+    if (confirm('Clear entire cart?')) {
+      this.cartService.clearCart().subscribe({
+        next: () => {
+          this.loadCart();
+          console.log('Cart cleared');
+        },
+        error: () => {
+          console.error('Failed to clear cart');
+        }
+      });
+    }
+  }
+
+  getTotalWithDelivery(): number {
+    return this.totalAmount + this.deliveryFee;
   }
 
   confirmOrder() {
-    alert('Заказ оформлен! Проверьте вкладку заказов.');
-    // Здесь будет вызов твоего process_checkout на бэкенде
+    if (this.cartItems.length === 0) {
+      console.error('Your cart is empty');
+      return;
+    }
+    // Will connect to checkout
+    console.log('Proceed to checkout');
   }
 }

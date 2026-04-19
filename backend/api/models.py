@@ -59,12 +59,18 @@ class CartItem(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    PAYMENT_CHOICES = [
+        ('cash',      'Cash'),
+        ('card',      'Card'),
+        ('kaspi',     'Kaspi Pay'),
+        ('apple_pay', 'Apple Pay'),
+    ]
+    user             = models.ForeignKey(User, on_delete=models.CASCADE)
+    total_amount     = models.DecimalField(max_digits=10, decimal_places=2)
     delivery_address = models.TextField()
-    status = models.CharField(max_length=20, default='pending')
-    created_at = models.DateTimeField(auto_now_add=True)
-
+    payment_method   = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='cash')
+    status           = models.CharField(max_length=20, default='pending')
+    created_at       = models.DateTimeField(auto_now_add=True)
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)

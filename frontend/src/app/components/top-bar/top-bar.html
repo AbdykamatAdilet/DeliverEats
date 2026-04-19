@@ -1,0 +1,85 @@
+<nav class="top-bar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <a routerLink="/menu" class="brand-link">
+                <span class="brand-icon"></span>
+                <span class="brand-text">DeliverEats</span>
+            </a>
+        </div>
+
+        <button class="mobile-menu-btn" (click)="toggleMenu()">
+            <span class="menu-icon">☰</span>
+        </button>
+
+        <div class="nav-links desktop-nav">
+            @for (item of navItems; track item.path) {
+                <a 
+                    [routerLink]="item.path" 
+                    routerLinkActive="active"
+                    class="nav-link">
+                    <span class="nav-icon">{{ item.icon }}</span>
+                    <span class="nav-label">{{ item.label }}</span>
+                    @if (item.label === 'Cart' && cartItemCount > 0) {
+                        <span class="cart-badge">{{ cartItemCount }}</span>
+                    }
+                </a>
+            }
+        </div>
+
+        <div class="user-menu desktop-nav">
+            @if (isLoggedIn()) {
+                <div class="user-info">
+                    <span class="user-icon">👤</span>
+                    <span class="username">{{ username || 'User' }}</span>
+                </div>
+                <button class="logout-btn" (click)="logout()">
+                    <span class="logout-icon">🚪</span>
+                    <span>Logout</span>
+                </button>
+            } @else {
+                <a routerLink="/login" class="login-link">Login</a>
+            }
+        </div>
+
+        <div class="mobile-nav" [class.open]="isMenuOpen">
+            <div class="mobile-header">
+                <div class="mobile-user-info">
+                    <span class="user-icon-large">👤</span>
+                    <div class="mobile-user-details">
+                        <span class="mobile-username">{{ username || 'Guest' }}</span>
+                        <span class="mobile-user-email">{{ isLoggedIn() ? 'Logged in' : 'Not logged in' }}</span>
+                    </div>
+                </div>
+                <button class="mobile-close" (click)="closeMenu()">×</button>
+            </div>
+            <div class="mobile-nav-links">
+                @for (item of navItems; track item.path) {
+                    <a 
+                        [routerLink]="item.path" 
+                        routerLinkActive="active"
+                        class="mobile-nav-link"
+                        (click)="closeMenu()">
+                        <span class="nav-icon">{{ item.icon }}</span>
+                        <span>{{ item.label }}</span>
+                        @if (item.label === 'Cart' && cartItemCount > 0) {
+                            <span class="cart-badge-mobile">{{ cartItemCount }}</span>
+                        }
+                    </a>
+                }
+            </div>
+            @if (isLoggedIn()) {
+                <button class="mobile-logout-btn" (click)="logout()">
+                    Logout
+                </button>
+            } @else {
+                <a routerLink="/login" class="mobile-login-btn" (click)="closeMenu()">
+                    Login
+                </a>
+            }
+        </div>
+    </div>
+</nav>
+
+@if (isMenuOpen) {
+    <div class="mobile-overlay" (click)="closeMenu()"></div>
+}
