@@ -5,6 +5,7 @@ import { ProfileComponent } from './components/profile/profile';
 import { AddressListComponent } from './components/address-list/address-list';
 import { AddressFormComponent } from './components/address-form/address-form';
 import { CheckoutComponent }    from './components/checkout/checkout';
+import { Home } from './components/home/home';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -15,6 +16,7 @@ export const routes: Routes = [
   { path: 'checkout', component: CheckoutComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   // Сюда добавишь пути для напарников, например:
+  { path: '', component: Home }  // Сюда добавишь пути для напарников, например:
   // { path: 'catalog', component: CatalogComponent },
   // { path: 'profile', component: ProfileComponent },
 ];

@@ -1,0 +1,93 @@
+<div class="container">
+
+  <!-- ЛЕВОЕ МЕНЮ -->
+  <div class="sidebar">
+    <h3>Категории</h3>
+    <button *ngFor="let cat of categories"
+            (click)="scrollToCategory(cat.id)">
+      {{ cat.name }}
+    </button>
+       <!-- Адрес кнопка-->
+  </div>
+  <div class="address-block">
+
+    <div *ngIf="address && !isEditingAddress">
+      📍 {{ address }}
+      <button (click)="editAddress()">Изменить</button>
+    </div>
+  
+    <div *ngIf="isEditingAddress">
+      <input [(ngModel)]="address" placeholder="Введите адрес" />
+      <button (click)="saveAddress()">Сохранить</button>
+    </div>
+  
+
+    <div *ngIf="!address && !isEditingAddress">
+      <button (click)="editAddress()">Указать адрес</button>
+    </div>
+  
+  </div>
+  <!-- ЦЕНТР -->
+  <div class="content">
+
+    <h2>Меню</h2>
+
+    <!--  Поиск -->
+    <input [(ngModel)]="searchText" placeholder="Поиск..." />
+
+    <!-- Категории -->
+    <div *ngFor="let cat of categories">
+
+      <h2 [id]="cat.id">{{ cat.name }}</h2>
+
+      <div class="menu">
+
+        <div class="card"
+             *ngFor="let item of filteredItems"
+             [hidden]="item.category !== cat.id">
+
+          <h3>{{ item.name }}</h3>
+          <p>{{ item.price }} ₸</p>
+
+          <button (click)="addToCart(item)">
+            Добавить
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ПРАВАЯ ЧАСТЬ (КОРЗИНА) -->
+  <div class="cart">
+
+    <div *ngFor="let item of cart" class="cart-item">
+
+      <p>{{ item.name }}</p>
+    
+      <p>{{ item.price }} ₸</p>
+    
+      <div>
+        <button (click)="decrease(item)">-</button>
+        {{ item.quantity }}
+        <button (click)="increase(item)">+</button>
+      </div>
+    
+      <button (click)="remove(item)">❌</button>
+    
+    </div>
+    
+    <hr>
+    
+    <p><b>Итого: {{ totalPrice }} ₸</b></p>
+    <hr>
+
+    <button (click)="checkout()">
+      Оформить заказ
+    </button>
+
+  </div>
+
+</div>
