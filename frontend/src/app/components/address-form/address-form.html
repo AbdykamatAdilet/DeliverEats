@@ -1,0 +1,120 @@
+<div class="address-form">
+    <div class="form-header">
+        <h3>{{ isEditMode ? '✏️ Edit Address' : '📍 Add New Address' }}</h3>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #addressForm="ngForm">
+        <div class="form-group">
+            <label>Address Type</label>
+            <div class="radio-group">
+                <label class="radio-option">
+                    <input type="radio" name="address_type" [(ngModel)]="formData.address_type" value="home" required>
+                    <span>Home</span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="address_type" [(ngModel)]="formData.address_type" value="work" required>
+                    <span>Work</span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="address_type" [(ngModel)]="formData.address_type" value="other" required>
+                    <span>Other</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Street Address *</label>
+            <input type="text" 
+                   name="street"
+                   class="form-control"
+                   [(ngModel)]="formData.street" 
+                   required
+                   minlength="3"
+                   placeholder="Enter street name"
+                   #street="ngModel">
+            <div class="error-text" *ngIf="street.invalid && street.touched">
+                Street must be at least 3 characters
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Building/House *</label>
+                <input type="text" 
+                       name="building"
+                       class="form-control"
+                       [(ngModel)]="formData.building" 
+                       required
+                       placeholder="Building number">
+            </div>
+            <div class="form-group">
+                <label>Apartment</label>
+                <input type="text" 
+                       name="apartment"
+                       class="form-control"
+                       [(ngModel)]="formData.apartment"
+                       placeholder="Apt, suite, unit">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Entrance</label>
+                <input type="text" 
+                       name="entrance"
+                       class="form-control"
+                       [(ngModel)]="formData.entrance"
+                       placeholder="Entrance number">
+            </div>
+            <div class="form-group">
+                <label>Floor</label>
+                <input type="text" 
+                       name="floor"
+                       class="form-control"
+                       [(ngModel)]="formData.floor"
+                       placeholder="Floor number">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Phone Number *</label>
+            <input type="tel" 
+                   name="phone_number"
+                   class="form-control"
+                   placeholder="+7(777)-123-45-67"
+                   [(ngModel)]="formData.phone_number" 
+                   required
+                   pattern="^\+7\(\d{3}\)-\d{3}-\d{2}-\d{2}$"
+                   #phone="ngModel">
+            <div class="error-text" *ngIf="phone.invalid && phone.touched">
+                Format: +7(XXX)-XXX-XX-XX
+            </div>
+            <div class="hint-text">Example: +7(777)-123-45-67</div>
+        </div>
+
+        <div class="form-group">
+            <label>Special Instructions</label>
+            <textarea name="special_instructions"
+                      class="form-control"
+                      rows="2"
+                      [(ngModel)]="formData.special_instructions"
+                      placeholder="Door code, landmark, delivery notes..."></textarea>
+        </div>
+
+        <div class="checkbox-group">
+            <label class="checkbox-option">
+                <input type="checkbox" name="is_default" [(ngModel)]="formData.is_default">
+                <span>Set as default address</span>
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="isLoading">
+                Cancel
+            </button>
+            <button type="submit" class="btn-save" [disabled]="!addressForm.valid || isLoading">
+                {{ isLoading ? 'Saving...' : (isEditMode ? 'Update Address' : 'Save Address') }}
+            </button>
+        </div>
+    </form>
+</div>
