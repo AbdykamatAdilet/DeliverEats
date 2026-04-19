@@ -6,21 +6,20 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CartService {
-  // Use your Django server URL
-  private apiUrl = 'http://127.0.0.1:8000/api/cart/';
+  private apiUrl = 'http://127.0.0.1:8000/api'; 
 
   constructor(private http: HttpClient) {}
 
   getCartItems(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/cart/`)
+    return this.http.get(`${this.apiUrl}/cart/`);
   }
 
-  addToCart(product: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/cart/`, product);
+  addToCart(menuItemId: number, quantity: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/cart/`, { menu_item: menuItemId, quantity: quantity });
   }
 
   removeItem(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/cart/${id}/`);
+    return this.http.delete(`${this.apiUrl}/cart/remove/${id}/`); 
   }
 
   clearCart(): Observable<any> {
@@ -28,6 +27,6 @@ export class CartService {
   }
 
   processCheckout(orderData: any): Observable<any> {
-    return this.http.post('http://127.0.0.1:8000/api/checkout/', orderData);
+    return this.http.post(`${this.apiUrl}/checkout/`, orderData);
   }
 }

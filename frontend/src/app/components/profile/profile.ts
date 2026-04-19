@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -22,7 +22,8 @@ export class ProfileComponent implements OnInit {
     private authService: AuthService,
     private orderService: OrderService,
     private errorHandler: ErrorHandlerService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -36,6 +37,7 @@ export class ProfileComponent implements OnInit {
       next: (data) => {
         this.user = data;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorHandler.showError('Failed to load profile');
