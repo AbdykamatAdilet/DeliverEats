@@ -1,3 +1,4 @@
+from django import views
 from django.urls import path
 from .views import (
     AddressListCreateAPIView,
@@ -17,4 +18,5 @@ urlpatterns = [
     path('checkout/', process_checkout, name='process-checkout'),
     path('cart/', CartAPIView.as_view(), name='cart'),
     path('cart/<int:pk>/', remove_from_cart, name='cart-remove'),
+    path('login/', views.login_view, name='login'),
 ]
