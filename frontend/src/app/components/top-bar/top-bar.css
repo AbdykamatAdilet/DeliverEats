@@ -5,7 +5,7 @@
     right: 0;
     background: white;
     border-bottom: 1px solid #eee;
-    z-index: 100;
+    z-index: 1000;
 }
 
 .nav-container {
@@ -25,10 +25,19 @@
     text-decoration: none;
 }
 
+.brand-icon {
+    font-size: 24px;
+    color: #dc3545;
+}
+
 .brand-text {
     font-size: 20px;
     font-weight: 700;
-    color: #e84040;
+    color: #dc3545;
+}
+
+.desktop-nav {
+    display: flex;
 }
 
 .nav-links {
@@ -45,19 +54,19 @@
 }
 
 .nav-link:hover {
-    color: #e84040;
+    color: #dc3545;
 }
 
 .nav-link.active {
-    color: #e84040;
-    border-bottom: 2px solid #e84040;
+    color: #dc3545;
+    border-bottom: 2px solid #dc3545;
 }
 
 .cart-badge {
     position: absolute;
     top: -8px;
     right: -12px;
-    background: #e84040;
+    background: #dc3545;
     color: white;
     border-radius: 50%;
     width: 16px;
@@ -81,8 +90,8 @@
 
 .logout-btn {
     background: none;
-    border: 1px solid #e84040;
-    color: #e84040;
+    border: 1px solid #dc3545;
+    color: #dc3545;
     padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
@@ -95,24 +104,14 @@
 
 .login-link {
     text-decoration: none;
-    color: #e84040;
+    color: #dc3545;
     font-weight: 500;
 }
-
-@media (max-width: 600px) {
-    .nav-links {
-        gap: 10px;
-    }
-    
-    .brand-text {
-        font-size: 16px;
-    }
-    
-    .nav-link span:last-child {
+.login-link:hover {
+    text-decoration: underline;
+}
+@media (min-width: 769px) {
+    .mobile-nav, .mobile-overlay {
         display: none;
-    }
-    
-    .nav-link {
-        font-size: 20px;
     }
 }

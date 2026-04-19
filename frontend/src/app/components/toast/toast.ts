@@ -7,8 +7,8 @@ import { Subscription } from 'rxjs';
   selector: 'app-error-message',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './error-message.component.html',
-  styleUrls: ['./error-message.component.css']
+  templateUrl: './toast.html',
+  styleUrls: ['./toast.css']
 })
 export class ErrorMessageComponent implements OnInit, OnDestroy {
   message: ErrorMessage | null = null;

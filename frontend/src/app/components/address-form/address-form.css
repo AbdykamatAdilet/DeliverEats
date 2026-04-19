@@ -43,7 +43,7 @@
 
 .form-control:focus {
     outline: none;
-    border-color: #ff6b35;
+    border-color:  #dc3545;
     box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
 }
 
@@ -81,7 +81,7 @@ textarea.form-control {
 }
 
 .radio-option:hover {
-    border-color: #ff6b35;
+    border-color: #aa0505;
     background: #fff5f0;
 }
 
@@ -89,7 +89,7 @@ textarea.form-control {
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: #ff6b35;
+    accent-color: #dc3545;
     margin: 0;
 }
 
@@ -113,7 +113,7 @@ textarea.form-control {
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: #ff6b35;
+    accent-color: #fb0000dd;
 }
 
 .checkbox-option span {
@@ -155,7 +155,7 @@ textarea.form-control {
 }
 
 .btn-save:hover:not(:disabled) {
-    background: #e55a2b;
+    background:  #dc3545;
     transform: translateY(-1px);
 }
 

@@ -51,11 +51,11 @@
 }
 
 .address-option:hover {
-    border-color: #ff6b35;
+    border-color:  #dc3545;
 }
 
 .address-option.selected {
-    border-color: #ff6b35;
+    border-color: #dc3545;
     background: #fffaf5;
 }
 
@@ -71,7 +71,7 @@
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: #ff6b35;
+    accent-color: #dc3545;
 }
 
 .address-info {
@@ -94,7 +94,7 @@
 }
 
 .default-tag {
-    background: #ff6b35;
+    background:  #dc3545;
     color: white;
     padding: 2px 12px;
     border-radius: 20px;
@@ -130,7 +130,7 @@
 .btn-link {
     background: none;
     border: none;
-    color: #ff6b35;
+    color: #dc3545;
     cursor: pointer;
     margin-top: 10px;
     font-weight: 600;
@@ -148,7 +148,7 @@
 
 .form-control:focus {
     outline: none;
-    border-color: #ff6b35;
+    border-color: #dc3545;
 }
 
 .empty-cart {
@@ -158,7 +158,7 @@
 }
 
 .btn-menu {
-    background: #ff6b35;
+    background: #dc3545;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -243,11 +243,11 @@
 }
 
 .payment-btn:hover {
-    border-color: #ff6b35;
+    border-color:  #dc3545;
 }
 
 .payment-btn.active {
-    border-color: #ff6b35;
+    border-color:  #dc3545;
     background: #fffaf5;
 }
 
@@ -270,7 +270,7 @@
 .btn-place-order {
     width: 100%;
     padding: 16px;
-    background: #ff6b35;
+    background:  #dc3545;
     color: white;
     border: none;
     border-radius: 12px;
@@ -282,7 +282,7 @@
 }
 
 .btn-place-order:hover:not(:disabled) {
-    background: #e55a2b;
+    background: #dc3545;
     transform: translateY(-2px);
 }
 

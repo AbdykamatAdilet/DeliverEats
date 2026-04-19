@@ -10,8 +10,8 @@ import { Address } from '../../models/address';
     selector: 'app-address-form',
     standalone: true,
     imports: [CommonModule, FormsModule],
-    templateUrl: './address-form.component.html',
-    styleUrls: ['./address-form.component.css']
+    templateUrl: './address-form.html',
+    styleUrls: ['./address-form.css']
 })
 export class AddressFormComponent implements OnInit {
     @Input() address: Address | null = null;
@@ -21,10 +21,10 @@ export class AddressFormComponent implements OnInit {
     formData: Address = {
         address_type: 'home',
         street: '',
-        building: '',
-        apartment: '',
-        entrance: '',
-        floor: '',
+        building: null,
+        apartment: null,
+        entrance: null,
+        floor: null,
         phone_number: '',
         special_instructions: '',
         is_default: false

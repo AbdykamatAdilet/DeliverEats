@@ -1,100 +1,109 @@
 <div class="profile-container">
-    <div class="profile-header">
-        <div class="profile-avatar">
-            {{ getUserInitials() }}
+    @if (isLoading) {
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading profile...</p>
         </div>
-        <div class="profile-info">
-            <h2>{{ user?.full_name || user?.username || 'User Name' }}</h2>
-            <p>{{ user?.email || 'user@example.com' }}</p>
-            <span class="member-badge">⭐ Verified Member</span>
-        </div>
-        <button class="edit-profile-btn" (click)="editProfile()">
-            ✏️ Edit
-        </button>
-    </div>
+    }
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value">{{ orders.length }}</div>
-            <div class="stat-label">Total Orders</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ getTotalSpent() }} ₸</div>
-            <div class="stat-label">Total Spent</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ getFavoriteRestaurant() }}</div>
-            <div class="stat-label">Favorite</div>
-        </div>
-    </div>
-
-    <div class="section-header">
-        <h3>📦 Recent Orders</h3>
-        <button class="view-all" (click)="viewAllOrders()">View All</button>
-    </div>
-
-    <div class="orders-list">
-        @if (isLoading) {
-            <div class="loading-state">Loading...</div>
-        }
-        
-        @if (!isLoading && orders.length === 0) {
-            <div class="empty-state">
-                <p>No orders yet</p>
-                <button class="btn-order" routerLink="/menu">Start Ordering</button>
+    @if (!isLoading && user) {
+        <div class="profile-header">
+            <div class="profile-avatar">
+                {{ getUserInitials() }}
             </div>
-        }
-        
-        @for (order of orders.slice(0, 3); track order.id) {
-            <div class="order-card">
-                <div class="order-header-row">
-                    <div>
-                        <div class="order-number">Order #{{ order.orderNumber }}</div>
-                        <div class="order-restaurant">{{ order.restaurantName }}</div>
-                    </div>
-                    <div class="order-status" [class]="order.status">
-                        {{ order.status }}
-                    </div>
+            <div class="profile-info">
+                <h2>{{ user?.full_name || user?.username || 'User Name' }}</h2>
+                <p>{{ user?.email || 'user@example.com' }}</p>
+                <span class="member-badge">⭐ Verified Member</span>
+            </div>
+            <button class="edit-profile-btn" (click)="editProfile()">
+                ✏️ Edit
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ orders.length }}</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ getTotalSpent() }} ₸</div>
+                <div class="stat-label">Total Spent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ getFavoriteRestaurant() }}</div>
+                <div class="stat-label">Favorite</div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h3>📦 Recent Orders</h3>
+            <button class="view-all" (click)="viewAllOrders()">View All</button>
+        </div>
+
+        <div class="orders-list">
+            @if (isLoadingOrders) {
+                <div class="loading-state">Loading orders...</div>
+            }
+            
+            @if (!isLoadingOrders && orders.length === 0) {
+                <div class="empty-state">
+                    <p>No orders yet</p>
+                    <button class="btn-order" routerLink="/menu">Start Ordering</button>
                 </div>
-                <div class="order-details">
-                    <span>📅 {{ order.date | date:'MMM dd, yyyy' }}</span>
-                    <span>💰 {{ order.totalAmount }} ₸</span>
+            }
+            
+            @for (order of orders.slice(0, 3); track order.id) {
+                <div class="order-card">
+                    <div class="order-header-row">
+                        <div>
+                            <div class="order-number">Order #{{ order.orderNumber || order.id }}</div>
+                            <div class="order-restaurant">{{ order.restaurantName || 'DeliverEats' }}</div>
+                        </div>
+                        <div class="order-status" [class]="order.status || 'pending'">
+                            {{ order.status || 'Pending' }}
+                        </div>
+                    </div>
+                    <div class="order-details">
+                        <span>{{ order.created_at || order.date | date:'MMM dd, yyyy' }}</span>
+                        <span>{{ order.totalAmount || order.total_amount }} ₸</span>
+                    </div>
+                    <button class="view-details" (click)="viewOrderDetails(order)">
+                        View Details →
+                    </button>
                 </div>
-                <button class="view-details" (click)="viewOrderDetails(order)">
-                    View Details →
-                </button>
-            </div>
-        }
-    </div>
+            }
+        </div>
 
-    <div class="settings-grid">
-        <div class="setting-item" (click)="goToAddresses()">
-            <span class="setting-icon">📍</span>
-            <div>
-                <h4>Addresses</h4>
-                <p>Manage delivery addresses</p>
+        <div class="settings-grid">
+            <div class="setting-item" (click)="goToAddresses()">
+                <span class="setting-icon">📍</span>
+                <div>
+                    <h4>Addresses</h4>
+                    <p>Manage delivery addresses</p>
+                </div>
+            </div>
+            <div class="setting-item" (click)="goToPayment()">
+                <span class="setting-icon">💳</span>
+                <div>
+                    <h4>Payment</h4>
+                    <p>Payment methods</p>
+                </div>
+            </div>
+            <div class="setting-item" (click)="goToSecurity()">
+                <span class="setting-icon">🔒</span>
+                <div>
+                    <h4>Security</h4>
+                    <p>Change password</p>
+                </div>
+            </div>
+            <div class="setting-item" (click)="logout()">
+                <span class="setting-icon">🚪</span>
+                <div>
+                    <h4>Logout</h4>
+                    <p>Sign out</p>
+                </div>
             </div>
         </div>
-        <div class="setting-item" (click)="goToPayment()">
-            <span class="setting-icon">💳</span>
-            <div>
-                <h4>Payment</h4>
-                <p>Payment methods</p>
-            </div>
-        </div>
-        <div class="setting-item" (click)="goToSecurity()">
-            <span class="setting-icon">🔒</span>
-            <div>
-                <h4>Security</h4>
-                <p>Change password</p>
-            </div>
-        </div>
-        <div class="setting-item" (click)="logout()">
-            <span class="setting-icon">🚪</span>
-            <div>
-                <h4>Logout</h4>
-                <p>Sign out</p>
-            </div>
-        </div>
-    </div>
+    }
 </div>

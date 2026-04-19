@@ -1,93 +1,117 @@
-<div class="container">
+<div class="home-container">
+    <div class="address-bar">
+        @if (address && !isEditingAddress) {
+            <div class="address-display">
+                <span class="address-icon">📍</span>
+                <span class="address-text">{{ address }}</span>
+                <button class="btn-edit-address" (click)="editAddress()">✏️ Edit</button>
+            </div>
+        }
+        
+        @if (isEditingAddress) {
+            <div class="address-edit">
+                <input
+                    type="text"
+                    [(ngModel)]="address"
+                    placeholder="Enter delivery address"
+                    class="address-input">
+                <button class="btn-save-address" (click)="saveAddress()">💾 Save</button>
+            </div>
+        }
 
-  <!-- ЛЕВОЕ МЕНЮ -->
-  <div class="sidebar">
-    <h3>Категории</h3>
-    <button *ngFor="let cat of categories"
-            (click)="scrollToCategory(cat.id)">
-      {{ cat.name }}
-    </button>
-       <!-- Адрес кнопка-->
-  </div>
-  <div class="address-block">
-
-    <div *ngIf="address && !isEditingAddress">
-      📍 {{ address }}
-      <button (click)="editAddress()">Изменить</button>
+        @if (!address && !isEditingAddress) {
+            <div class="address-empty">
+                <button class="btn-add-address" (click)="editAddress()">
+                    ➕ Add Delivery Address
+                </button>
+            </div>
+        }
     </div>
-  
-    <div *ngIf="isEditingAddress">
-      <input [(ngModel)]="address" placeholder="Введите адрес" />
-      <button (click)="saveAddress()">Сохранить</button>
-    </div>
-  
 
-    <div *ngIf="!address && !isEditingAddress">
-      <button (click)="editAddress()">Указать адрес</button>
-    </div>
-  
-  </div>
-  <!-- ЦЕНТР -->
-  <div class="content">
-
-    <h2>Меню</h2>
-
-    <!--  Поиск -->
-    <input [(ngModel)]="searchText" placeholder="Поиск..." />
-
-    <!-- Категории -->
-    <div *ngFor="let cat of categories">
-
-      <h2 [id]="cat.id">{{ cat.name }}</h2>
-
-      <div class="menu">
-
-        <div class="card"
-             *ngFor="let item of filteredItems"
-             [hidden]="item.category !== cat.id">
-
-          <h3>{{ item.name }}</h3>
-          <p>{{ item.price }} ₸</p>
-
-          <button (click)="addToCart(item)">
-            Добавить
-          </button>
-
+    <div class="home-grid">
+        <div class="categories-sidebar">
+            <h3>🍽️ Categories</h3>
+            <div class="categories-list">
+                @for (cat of categories; track cat.id) {
+                    <button 
+                        class="category-btn"
+                        [class.active]="activeCategory === cat.id"
+                        (click)="scrollToCategory(cat.id)">
+                        {{ cat.name }}
+                    </button>
+                }
+            </div>
         </div>
 
-      </div>
+    
+        <div class="menu-content">
+            <div class="search-section">
+                <input 
+                    type="text" 
+                    [(ngModel)]="searchText" 
+                    placeholder="🔍 Search dishes..."
+                    class="search-input">
+            </div>
+
+            @for (cat of categories; track cat.id) {
+                <div class="category-section" [id]="cat.id">
+                    <h2 class="category-title">{{ cat.name }}</h2>
+                    <div class="menu-grid">
+                        @for (item of filteredItems; track item.name) {
+                            @if (item.category === cat.id) {
+                                <div class="menu-card">
+                                    <div class="menu-card-content">
+                                        <h3 class="item-name">{{ item.name }}</h3>
+                                        <p class="item-price">{{ item.price }} ₸</p>
+                                        <button class="btn-add-to-cart" (click)="addToCart(item)">
+                                            🛒 Add to Cart
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="cart-sidebar">
+            <h3>🛒 Cart</h3>
+            
+            @if (cart.length === 0) {
+                <div class="empty-cart">
+                    <p>Your cart is empty</p>
+                    <p class="empty-hint">Add items from the menu</p>
+                </div>
+            }
+            
+            @if (cart.length > 0) {
+                <div class="cart-items">
+                    @for (item of cart; track item.name) {
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <span class="cart-item-name">{{ item.name }}</span>
+                                <span class="cart-item-price">{{ item.price }} ₸</span>
+                            </div>
+                            <div class="cart-item-controls">
+                                <button class="qty-btn" (click)="decrease(item)">-</button>
+                                <span class="qty-value">{{ item.quantity }}</span>
+                                <button class="qty-btn" (click)="increase(item)">+</button>
+                                <button class="remove-btn" (click)="remove(item)">🗑️</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+                
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span class="total-amount">{{ totalPrice }} ₸</span>
+                </div>
+                
+                <button class="btn-checkout" (click)="checkout()">
+                    ✅ Checkout
+                </button>
+            }
+        </div>
     </div>
-
-  </div>
-
-  <!-- ПРАВАЯ ЧАСТЬ (КОРЗИНА) -->
-  <div class="cart">
-
-    <div *ngFor="let item of cart" class="cart-item">
-
-      <p>{{ item.name }}</p>
-    
-      <p>{{ item.price }} ₸</p>
-    
-      <div>
-        <button (click)="decrease(item)">-</button>
-        {{ item.quantity }}
-        <button (click)="increase(item)">+</button>
-      </div>
-    
-      <button (click)="remove(item)">❌</button>
-    
-    </div>
-    
-    <hr>
-    
-    <p><b>Итого: {{ totalPrice }} ₸</b></p>
-    <hr>
-
-    <button (click)="checkout()">
-      Оформить заказ
-    </button>
-
-  </div>
-
 </div>

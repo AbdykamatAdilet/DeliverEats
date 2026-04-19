@@ -19,7 +19,7 @@
 .profile-avatar {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #ff6b35, #e55a2b);
+    background: linear-gradient(135deg,  #dc3545, #ee0909);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -46,7 +46,7 @@
 
 .member-badge {
     background: #fff0eb;
-    color: #ff6b35;
+    color:  #dc3545;
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 12px;
@@ -108,7 +108,7 @@
 .view-all {
     background: none;
     border: none;
-    color: #ff6b35;
+    color:  #dc3545;
     cursor: pointer;
     font-weight: 500;
 }
@@ -191,7 +191,7 @@
 }
 
 .btn-order {
-    background: #ff6b35;
+    background:  #dc3545;
     color: white;
     border: none;
     padding: 10px 24px;

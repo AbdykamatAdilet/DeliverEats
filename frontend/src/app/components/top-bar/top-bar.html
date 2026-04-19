@@ -1,15 +1,12 @@
 <nav class="top-bar">
     <div class="nav-container">
+
         <div class="nav-brand">
             <a routerLink="/menu" class="brand-link">
-                <span class="brand-icon"></span>
+                <i class="fas fa-utensils brand-icon"></i>
                 <span class="brand-text">DeliverEats</span>
             </a>
         </div>
-
-        <button class="mobile-menu-btn" (click)="toggleMenu()">
-            <span class="menu-icon">☰</span>
-        </button>
 
         <div class="nav-links desktop-nav">
             @for (item of navItems; track item.path) {
@@ -33,21 +30,28 @@
                     <span class="username">{{ username || 'User' }}</span>
                 </div>
                 <button class="logout-btn" (click)="logout()">
-                    <span class="logout-icon">🚪</span>
-                    <span>Logout</span>
+                    🚪 Logout
                 </button>
             } @else {
                 <a routerLink="/login" class="login-link">Login</a>
             }
         </div>
 
-        <div class="mobile-nav" [class.open]="isMenuOpen">
+        <button class="mobile-menu-btn" (click)="toggleMenu()">
+            ☰
+        </button>
+    </div>
+
+    @if (isMenuOpen) {
+        <div class="mobile-nav">
             <div class="mobile-header">
                 <div class="mobile-user-info">
                     <span class="user-icon-large">👤</span>
                     <div class="mobile-user-details">
                         <span class="mobile-username">{{ username || 'Guest' }}</span>
-                        <span class="mobile-user-email">{{ isLoggedIn() ? 'Logged in' : 'Not logged in' }}</span>
+                        <span class="mobile-user-email">
+                            {{ isLoggedIn() ? 'Logged in' : 'Not logged in' }}
+                        </span>
                     </div>
                 </div>
                 <button class="mobile-close" (click)="closeMenu()">×</button>
@@ -68,16 +72,12 @@
                 }
             </div>
             @if (isLoggedIn()) {
-                <button class="mobile-logout-btn" (click)="logout()">
-                    Logout
-                </button>
+                <button class="mobile-logout-btn" (click)="logout()">Logout</button>
             } @else {
-                <a routerLink="/login" class="mobile-login-btn" (click)="closeMenu()">
-                    Login
-                </a>
+                <a routerLink="/login" class="mobile-login-btn" (click)="closeMenu()">Login</a>
             }
         </div>
-    </div>
+    }
 </nav>
 
 @if (isMenuOpen) {

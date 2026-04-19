@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { ErrorHandlerService } from '../../services/error-handler.service';
 
@@ -19,7 +19,8 @@ export class CartComponent implements OnInit {
 
   constructor(
     private cartService: CartService,
-    private errorHandlerService: ErrorHandlerService
+    private errorHandlerService: ErrorHandlerService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -29,13 +30,19 @@ export class CartComponent implements OnInit {
   loadCart() {
     this.isLoading = true;
     this.cartService.getCartItems().subscribe({
-      next: (data) => {
-        this.cartItems = data;
+      next: (data: any) => {
+        if (Array.isArray(data)) {
+            this.cartItems = data;
+        } else if (data.items) {
+            this.cartItems = data.items;
+        } else {
+            this.cartItems = [];
+        }
         this.calculateTotal();
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error loading cart', err);
+        this.errorHandlerService.showError('Failed to load cart');
         this.isLoading = false;
       }
     });
@@ -58,7 +65,6 @@ export class CartComponent implements OnInit {
     
     item.quantity = newQuantity;
     this.calculateTotal();
-    console.log('Quantity updated');
   }
 
   removeItem(id: number) {
@@ -66,10 +72,10 @@ export class CartComponent implements OnInit {
       this.cartService.removeItem(id).subscribe({
         next: () => {
           this.loadCart();
-          console.log('Item removed');
+          this.errorHandlerService.showSuccess('Item removed from cart');
         },
         error: () => {
-          console.error('Failed to remove item');
+          this.errorHandlerService.showError('Failed to remove item');
         }
       });
     }
@@ -80,10 +86,10 @@ export class CartComponent implements OnInit {
       this.cartService.clearCart().subscribe({
         next: () => {
           this.loadCart();
-          console.log('Cart cleared');
+          this.errorHandlerService.showSuccess('Cart cleared');
         },
         error: () => {
-          console.error('Failed to clear cart');
+          this.errorHandlerService.showError('Failed to clear cart');
         }
       });
     }
@@ -95,10 +101,9 @@ export class CartComponent implements OnInit {
 
   confirmOrder() {
     if (this.cartItems.length === 0) {
-      console.error('Your cart is empty');
+      this.errorHandlerService.showError('Your cart is empty');
       return;
     }
-    // Will connect to checkout
-    console.log('Proceed to checkout');
+    this.router.navigate(['/checkout']);
   }
 }

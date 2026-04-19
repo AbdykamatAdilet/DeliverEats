@@ -8,15 +8,16 @@ import { CheckoutComponent }    from './components/checkout/checkout';
 import { Home } from './components/home/home';
 
 export const routes: Routes = [
+  { path: '', component: Home }, 
+  { path: 'menu', component: Home },
   { path: 'login', component: LoginComponent },
   { path: 'cart', component: CartComponent },
   { path: 'profile', component: ProfileComponent },
   { path: 'addresses', component: AddressListComponent },
   { path: 'addresses/new', component: AddressFormComponent },
+  { path: 'addresses/:id', component: AddressFormComponent },
   { path: 'checkout', component: CheckoutComponent },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
   // Сюда добавишь пути для напарников, например:
-  { path: '', component: Home }  // Сюда добавишь пути для напарников, например:
   // { path: 'catalog', component: CatalogComponent },
   // { path: 'profile', component: ProfileComponent },
 ];

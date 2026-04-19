@@ -1,29 +1,56 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms'; // Нужно для ngModel
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
+import { ErrorHandlerService } from '../../services/error-handler.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule, RouterLink],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrls: ['./login.css']
 })
 export class LoginComponent {
-  credentials = { username: '', password: '' };
+  username = '';
+  password = '';
+  rememberMe = false;
+  isLoading = false;
   errorMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private errorHandler: ErrorHandlerService,
+    private router: Router
+  ) {}
 
   onLogin() {
-    this.authService.login(this.credentials).subscribe({
+    if (!this.username || !this.password) {
+      this.errorHandler.showError('Please enter username and password');
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+    
+    console.log('Logging in with:', this.username);
+    
+    this.authService.login({ 
+      username: this.username, 
+      password: this.password 
+    }).subscribe({
       next: (response) => {
-        console.log('Успех!', response);
-        this.router.navigate(['/']);
+        console.log('Login successful!', response);
+        this.errorHandler.showSuccess(`Welcome, ${this.username}!`);
+        this.router.navigate(['/menu']);
+        this.isLoading = false;
       },
       error: (err) => {
-        this.errorMessage = 'Неверный логин или пароль';
+        console.error('Login error:', err);
+        this.errorMessage = err.message || 'Invalid username or password';
+        this.errorHandler.showError(this.errorMessage);
+        this.isLoading = false;
       }
     });
   }

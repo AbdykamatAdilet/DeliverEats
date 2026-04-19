@@ -29,7 +29,7 @@
 .login-logo h1 {
     font-size: 28px;
     font-weight: 700;
-    color: #ff6b35;
+    color:  #dc3545;
     margin-bottom: 8px;
 }
 
@@ -37,6 +37,17 @@
     color: #666;
     font-size: 14px;
 }
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border: 1px solid #f5c6cb;
+}
+
 
 .form-group {
     margin-bottom: 24px;
@@ -73,8 +84,8 @@
 
 .input-icon input:focus {
     outline: none;
-    border-color: #ff6b35;
-    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
 }
 
 .input-icon input::placeholder {
@@ -107,11 +118,11 @@
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: #ff6b35;
+    accent-color:  #dc3545;
 }
 
 .forgot-link {
-    color: #ff6b35;
+    color:  #dc3545;
     text-decoration: none;
     font-size: 14px;
 }
@@ -123,7 +134,7 @@
 .btn-login {
     width: 100%;
     padding: 14px;
-    background: #ff6b35;
+    background:  #dc3545;
     color: white;
     border: none;
     border-radius: 12px;
@@ -135,7 +146,7 @@
 }
 
 .btn-login:hover:not(:disabled) {
-    background: #e55a2b;
+    background: #dc3545;
     transform: translateY(-2px);
 }
 

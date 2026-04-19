@@ -13,8 +13,8 @@ import { CartService } from '../../services/cart.service';
   selector: 'app-checkout',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './checkout.component.html',
-  styleUrls: ['./checkout.component.css']
+  templateUrl: './checkout.html',
+  styleUrls: ['./checkout.css']
 })
 export class CheckoutComponent implements OnInit {
   addresses: Address[] = [];
@@ -56,8 +56,7 @@ export class CheckoutComponent implements OnInit {
           this.selectedAddressId = this.addresses[0].id!;
         }
       },
-      error: (err) => {
-        console.error('Error loading addresses:', err);
+      error: () => {
         this.errorHandler.showError('Failed to load addresses');
       }
     });
@@ -69,8 +68,7 @@ export class CheckoutComponent implements OnInit {
         this.cartItems = items;
         this.calculateTotal();
       },
-      error: (err) => {
-        console.error('Error loading cart:', err);
+      error: () => {
         this.cartTotal = 0;
       }
     });
@@ -84,7 +82,26 @@ export class CheckoutComponent implements OnInit {
     }, 0);
   }
 
-  onPlaceOrder() {
+  getAddressIcon(type: string): string {
+    switch(type) {
+      case 'home': return '🏠';
+      case 'work': return '💼';
+      default: return '📍';
+    }
+  }
+
+  getAddressSummary(address: Address): string {
+    let summary = address.street;
+    if (address.building) summary += `, ${address.building}`;
+    if (address.apartment) summary += `, apt ${address.apartment}`;
+    return summary;
+  }
+
+  getTotalWithDelivery(): number {
+    return this.cartTotal + this.deliveryFee;
+  }
+
+  placeOrder() {
     if (!this.selectedAddressId) {
       this.errorHandler.showError('Please select a delivery address');
       return;
@@ -123,22 +140,10 @@ export class CheckoutComponent implements OnInit {
         });
       },
       error: (err) => {
-        console.error('Checkout error:', err);
         const errorMsg = err.error?.error || err.error?.message || 'Failed to place order';
         this.errorHandler.showError(errorMsg);
         this.isLoading = false;
       }
     });
-  }
-
-  get totalWithDelivery(): number {
-    return this.cartTotal + this.deliveryFee;
-  }
-
-  getAddressSummary(address: Address): string {
-    let summary = address.street;
-    if (address.building) summary += `, ${address.building}`;
-    if (address.apartment) summary += `, apt ${address.apartment}`;
-    return summary;
   }
 }
