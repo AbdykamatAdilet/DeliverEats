@@ -1,5 +1,3 @@
-from tokenize import TokenError
-
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
@@ -8,11 +6,41 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Address
-from .serializers import AddressSerializer, CheckoutSerializer
+from .models import Address, MenuItem, Order
+from .serializers import AddressSerializer, CheckoutSerializer,  MenuItemSerializer, OrderSerializer
 from .models import Cart, CartItem, MenuItem, Order, OrderItem
 from .serializers import CartItemSerializer
 
+@api_view(['GET'])
+def menu_list(request):
+    search = request.GET.get('search', '')
+    items = MenuItem.available.filter(name__icontains=search)
+    serializer = MenuItemSerializer(items, many=True)
+    return Response(serializer.data)
+
+class OrderListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        orders = Order.objects.filter(user=request.user).order_by('-created_at')
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+
+class OrderDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pk):
+        order = get_object_or_404(Order, id=pk, user=request.user)
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
+    
+    def patch(self, request, pk):
+        order = get_object_or_404(Order, id=pk, user=request.user)
+        if order.status == 'pending':
+            order.status = 'cancelled'
+            order.save()
+            return Response({'message': 'Order cancelled successfully'})
+        return Response({'error': 'Cannot cancel this order'}, status=400)
 class AddressListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -159,19 +187,15 @@ def process_checkout(request):
     address = get_object_or_404(Address, id=data['address_id'], user=request.user)
     total = sum(item.menu_item.price * item.quantity for item in cart_items)
 
-    address_parts = [address.street]
-    if address.building:
-        address_parts.append(address.building)
-    if address.apartment:
-        address_parts.append(f"Apt {address.apartment}")
-    delivery_address_str = ", ".join(address_parts)
-
     order = Order.objects.create(
         user=request.user,
         total_amount=total,
-        delivery_address=delivery_address_str,
+        delivery_street=address.street,
+        delivery_building=address.building,
+        delivery_apartment=address.apartment or '',
         payment_method=data['payment_method'],
-        status='pending',
+        special_instructions=data.get('special_instructions', ''),
+        status='pending'
     )
 
     OrderItem.objects.bulk_create([
@@ -189,20 +213,43 @@ def process_checkout(request):
     return Response({
         'message': 'Order placed successfully!',
         'order_id': order.id,
+        'order_number': order.order_number,
         'status': order.status,
         'total_amount': str(order.total_amount),
         'estimated_delivery': '30-45 minutes',
     }, status=status.HTTP_201_CREATED)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_profile(request):
+    user = request.user
+    return Response({
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'date_joined': user.date_joined
+    })
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def logout_view(request):
-    refresh_token = request.data.get('refresh')
-    if not refresh_token:
-        return Response({'error': 'Refresh token required'}, status=status.HTTP_400_BAD_REQUEST)
-    try:
-        token = RefreshToken(refresh_token)
-        token.blacklist()
-        return Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
-    except TokenError:
-        return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
+@permission_classes([AllowAny])
+def login_view(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    
+    user = authenticate(username=username, password=password)
+    
+    if user:
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email
+            }
+        })
+    else:
+        return Response(
+            {'error': 'Invalid credentials'}, 
+            status=status.HTTP_401_UNAUTHORIZED
+        )
