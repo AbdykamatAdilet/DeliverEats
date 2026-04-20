@@ -1,0 +1,82 @@
+<div class="orders-container">
+    <div class="orders-header">
+        <h1>My Orders</h1>
+        <p>Track and manage your orders</p>
+    </div>
+
+    <div class="status-tabs">
+        <button *ngFor="let tab of statusTabs" 
+            class="status-tab" 
+            [class.active]="selectedStatus === tab.value"
+            (click)="changeStatus(tab.value)">
+            {{ tab.label }}
+        </button>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading your orders...</p>
+    </div>
+
+    <div *ngIf="!isLoading && filteredOrders.length === 0 && orders.length === 0" class="empty-state">
+        <div class="empty-icon">📦</div>
+        <h3>No orders yet</h3>
+        <p>You haven't placed any orders yet</p>
+        <button class="btn-order" routerLink="/menu">Start Ordering</button>
+    </div>
+
+    <div *ngIf="!isLoading && filteredOrders.length === 0 && orders.length > 0" class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>No {{ selectedStatus }} orders</h3>
+        <p>You don't have any orders with status "{{ selectedStatus }}"</p>
+        <button class="btn-order" (click)="changeStatus('all')">View All Orders</button>
+    </div>
+
+    <div *ngIf="!isLoading && filteredOrders.length > 0" class="orders-list">
+        <div *ngFor="let order of filteredOrders" class="order-card">
+            <div class="order-header">
+                <div class="order-info">
+                    <div class="order-number">Order #{{ order.orderNumber || order.id }}</div>
+                    <div class="order-date">{{ formatDate(order.date) }}</div>
+                </div>
+                <div class="order-status-badge" [class]="getStatusBadgeClass(order.status)">
+                    <span class="status-icon">{{ getStatusIcon(order.status) }}</span>
+                    <span class="status-text">{{ order.status | titlecase }}</span>
+                </div>
+            </div>
+
+            <div class="order-body">
+                <div class="order-restaurant">
+                    <span class="restaurant-icon">🍕</span>
+                    <span class="restaurant-name">{{ order.restaurantName }}</span>
+                </div>
+
+                <div class="order-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">-</span>
+                        <span class="detail-text">Total: {{ order.totalAmount }} ₸</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">-</span>
+                        <span class="detail-text">{{ order.payment_method | titlecase }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">-</span>
+                        <span class="detail-text">{{ order.delivery_street }}, {{ order.delivery_building }}</span>
+                    </div>
+                </div>
+
+                <div *ngIf="order.special_instructions" class="special-instructions">
+                    <span class="instruction-icon">-</span>
+                    <span class="instruction-text">{{ order.special_instructions }}</span>
+                </div>
+            </div>
+
+            <div class="order-footer">
+                <button class="btn-details" [routerLink]="['/orders', order.id]">
+                    View Details →
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

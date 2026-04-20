@@ -28,7 +28,7 @@
             <div class="form-group">
                 <label>Password</label>
                 <div class="input-icon">
-                    <span class="icon">🔒</span>
+                    <span class="icon"></span>
                     <input 
                         type="password" 
                         name="password"
@@ -53,7 +53,7 @@
 
             <button type="submit" class="btn-login" [disabled]="!loginForm.valid || isLoading">
                 @if (isLoading) {
-                    <span>⏳ Logging in...</span>
+                    <span>Logging in...</span>
                 } @else {
                     <span>Login</span>
                 }

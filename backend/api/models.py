@@ -2,6 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator, RegexValidator
 
+ORDER_STATUS = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('preparing', 'Preparing'),
+        ('delivering', 'Delivering'),
+        ('delivered', 'Delivered'),
+        ('cancelled', 'Cancelled'),
+    ]
+
 class Address(models.Model):
     ADDRESS_TYPES = [
         ('home', 'Home'),

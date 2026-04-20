@@ -18,21 +18,29 @@ def menu_list(request):
     serializer = MenuItemSerializer(items, many=True)
     return Response(serializer.data)
 
-from rest_framework.views import APIView
-
-class OrderCreateAPIView(APIView):
-    def post(self, request):
-        serializer = OrderSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data)
-        return Response(serializer.errors)
-
-class UserOrdersAPIView(APIView):
+class OrderListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
-        orders = Order.objects.filter(user=request.user)
+        orders = Order.objects.filter(user=request.user).order_by('-created_at')
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
+
+class OrderDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pk):
+        order = get_object_or_404(Order, id=pk, user=request.user)
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
+    
+    def patch(self, request, pk):
+        order = get_object_or_404(Order, id=pk, user=request.user)
+        if order.status == 'pending':
+            order.status = 'cancelled'
+            order.save()
+            return Response({'message': 'Order cancelled successfully'})
+        return Response({'error': 'Cannot cancel this order'}, status=400)
 class AddressListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -178,20 +186,16 @@ def process_checkout(request):
     data = serializer.validated_data
     address = get_object_or_404(Address, id=data['address_id'], user=request.user)
     total = sum(item.menu_item.price * item.quantity for item in cart_items)
-
-    address_parts = [address.street]
-    if address.building:
-        address_parts.append(address.building)
-    if address.apartment:
-        address_parts.append(f"Apt {address.apartment}")
-    delivery_address_str = ", ".join(address_parts)
-
+    
     order = Order.objects.create(
         user=request.user,
         total_amount=total,
-        delivery_address=delivery_address_str,
+        delivery_street=address.street,
+        delivery_building=address.building,
+        delivery_apartment=address.apartment or '',
         payment_method=data['payment_method'],
-        status='pending',
+        special_instructions=data.get('special_instructions', ''),
+        status='pending'
     )
 
     OrderItem.objects.bulk_create([
@@ -209,10 +213,12 @@ def process_checkout(request):
     return Response({
         'message': 'Order placed successfully!',
         'order_id': order.id,
+        'order_number': order.order_number,
         'status': order.status,
         'total_amount': str(order.total_amount),
         'estimated_delivery': '30-45 minutes',
     }, status=status.HTTP_201_CREATED)
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
