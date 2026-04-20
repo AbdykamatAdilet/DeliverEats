@@ -6,7 +6,7 @@ from .views import (
     AddressDetailAPIView,
     OrderDetailAPIView,
     OrderListAPIView,
-    menu_list, OrderCreateAPIView, UserOrdersAPIView,
+    menu_list,
     remove_from_cart,
     set_default_address,
     get_user_profile,
@@ -27,5 +27,4 @@ urlpatterns = [
     path('orders/', OrderListAPIView.as_view(), name='order-list'),
     path('orders/<int:pk>/', OrderDetailAPIView.as_view(), name='order-detail'),
     path('admin/', admin.site.urls),
-    path('api/', include('menu.urls')),
 ]
