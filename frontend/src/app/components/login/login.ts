@@ -36,10 +36,7 @@ export class LoginComponent {
     
     console.log('Logging in with:', this.username);
     
-    this.authService.login({ 
-      username: this.username, 
-      password: this.password 
-    }).subscribe({
+    this.authService.login(this.username, this.password).subscribe({
       next: (response) => {
         console.log('Login successful!', response);
         this.errorHandler.showSuccess(`Welcome, ${this.username}!`);

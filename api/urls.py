@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+
 from . import views
 from django.contrib import admin
 from django.urls import path, include
@@ -25,5 +27,6 @@ urlpatterns = [
     path('orders/create/', OrderCreateAPIView.as_view()),
     path('orders/', UserOrdersAPIView.as_view()),
     path('admin/', admin.site.urls),
-    path('api/', include('menu.urls')),
+    path('api/', include('api.urls')),
+    path('test/', lambda request: HttpResponse("OK")),
 ]
