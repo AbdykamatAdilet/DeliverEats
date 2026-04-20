@@ -14,7 +14,6 @@
                     [routerLink]="item.path" 
                     routerLinkActive="active"
                     class="nav-link">
-                    <span class="nav-icon">{{ item.icon }}</span>
                     <span class="nav-label">{{ item.label }}</span>
                     @if (item.label === 'Cart' && cartItemCount > 0) {
                         <span class="cart-badge">{{ cartItemCount }}</span>
@@ -26,7 +25,6 @@
         <div class="user-menu desktop-nav">
             @if (isLoggedIn()) {
                 <div class="user-info">
-                    <span class="user-icon">👤</span>
                     <span class="username">{{ username || 'User' }}</span>
                 </div>
                 <button class="logout-btn" (click)="logout()">
@@ -38,7 +36,6 @@
         </div>
 
         <button class="mobile-menu-btn" (click)="toggleMenu()">
-            ☰
         </button>
     </div>
 
@@ -63,7 +60,6 @@
                         routerLinkActive="active"
                         class="mobile-nav-link"
                         (click)="closeMenu()">
-                        <span class="nav-icon">{{ item.icon }}</span>
                         <span>{{ item.label }}</span>
                         @if (item.label === 'Cart' && cartItemCount > 0) {
                             <span class="cart-badge-mobile">{{ cartItemCount }}</span>

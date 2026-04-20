@@ -32,6 +32,7 @@ export class TopBarComponent implements OnInit {
         private errorHandler: ErrorHandlerService,
         private router: Router
     ) {}
+    cartCount = 0;
 
     ngOnInit() {
         this.loadUserProfile();
@@ -52,10 +53,10 @@ export class TopBarComponent implements OnInit {
     loadCartCount() {
         this.CartService.getCartItems().subscribe({
             next: (data: any) => {
-                this.cartItemCount = data.items?.length || data?.length || 0;
+                this.cartCount = data.items?.length || data?.length || 0;
             },
             error: () => {
-                this.cartItemCount = 0;
+                this.cartCount = 0;
             }
         });
     }

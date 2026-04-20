@@ -7,6 +7,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     AddressListCreateAPIView,
     AddressDetailAPIView,
+    OrderDetailAPIView,
+    OrderListAPIView,
     menu_list, OrderCreateAPIView, UserOrdersAPIView,
     remove_from_cart,
     set_default_address,
@@ -27,6 +29,8 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('menu/', menu_list),
     path('orders/create/', OrderCreateAPIView.as_view()),
+    path('orders/', OrderListAPIView.as_view(), name='order-list'),
+    path('orders/<int:pk>/', OrderDetailAPIView.as_view(), name='order-detail'),
     path('orders/', UserOrdersAPIView.as_view()),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),

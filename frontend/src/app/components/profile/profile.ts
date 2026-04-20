@@ -3,7 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ErrorHandlerService } from '../../services/error-handler.service';
-import { OrderService } from '../../services/order';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-profile',

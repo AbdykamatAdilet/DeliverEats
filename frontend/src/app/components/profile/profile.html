@@ -14,10 +14,10 @@
             <div class="profile-info">
                 <h2>{{ user?.full_name || user?.username || 'User Name' }}</h2>
                 <p>{{ user?.email || 'user@example.com' }}</p>
-                <span class="member-badge">⭐ Verified Member</span>
+                <span class="member-badge">Verified Member</span>
             </div>
             <button class="edit-profile-btn" (click)="editProfile()">
-                ✏️ Edit
+                Edit
             </button>
         </div>
 
@@ -37,7 +37,7 @@
         </div>
 
         <div class="section-header">
-            <h3>📦 Recent Orders</h3>
+            <h3>Recent Orders</h3>
             <button class="view-all" (click)="viewAllOrders()">View All</button>
         </div>
 

@@ -43,7 +43,10 @@ class MenuItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = ['id', 'order_number', 'status', 'payment_method', 'total_amount', 
+                  'delivery_street', 'delivery_building', 'delivery_apartment', 
+                  'special_instructions', 'created_at']
+        read_only_fields = ['id', 'order_number', 'created_at']
         
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:

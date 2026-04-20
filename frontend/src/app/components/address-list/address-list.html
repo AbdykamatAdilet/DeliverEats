@@ -60,7 +60,7 @@
                                 @if (address.floor) { | Floor: {{ address.floor }} }
                             </p>
                         }
-                        <p class="address-phone">📞 {{ address.phone_number }}</p>
+                        <p class="address-phone">{{ address.phone_number }}</p>
                         @if (address.special_instructions) {
                             <p class="address-notes">📝 {{ address.special_instructions }}</p>
                         }
@@ -68,11 +68,11 @@
 
                     <div class="card-actions">
                         <button class="btn-edit" (click)="onEditAddress(address)">
-                            ✏️ Edit
+                            Edit
                         </button>
                         @if (!address.is_default) {
                             <button class="btn-default" (click)="onSetDefault(address.id!)">
-                                ⭐ Set Default
+                                Set Default
                             </button>
                         }
                         <button class="btn-delete" (click)="onDeleteAddress(address.id!)">
