@@ -11,27 +11,21 @@ class Address(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses')
     address_type = models.CharField(max_length=10, choices=ADDRESS_TYPES, default='home')
-    street = models.CharField(max_length=255, validators=[MinLengthValidator(5)])
+    street = models.CharField(max_length=255)
     building = models.CharField(max_length=50, blank=True, null=True)
     apartment = models.CharField(max_length=50, blank=True, null=True)
     entrance = models.CharField(max_length=10, blank=True, null=True)
     floor = models.CharField(max_length=5, blank=True, null=True)
-    phone_number = models.CharField(
-        max_length=20,
-        validators=[RegexValidator(regex=r'^\+7\(\d{3}\)-\d{3}-\d{2}-\d{2}$')]
-    )
+    phone_number = models.CharField(max_length=20)
     special_instructions = models.TextField(blank=True, max_length=200)
     is_default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
         if self.is_default:
             Address.objects.filter(user=self.user, is_default=True)\
                 .exclude(pk=self.pk).update(is_default=False)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.street}"
+        super().save(*args, **kwargs)
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -45,13 +39,10 @@ class AvailableItemManager(models.Manager):
     
 class MenuItem(models.Model):
     name = models.CharField(max_length=255)
-    description = models.TextField(default='', blank=True)
+    description = models.TextField(blank=True, default='')
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT)
     is_available = models.BooleanField(default=True)
-
-    objects = models.Manager()
-    available = AvailableItemManager()
 
     def __str__(self):
         return self.name
@@ -68,6 +59,9 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        unique_together = ('cart', 'menu_item')
 
     def __str__(self):
         return f"{self.menu_item.name} x {self.quantity}"
@@ -97,21 +91,18 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"Order #{self.id}"
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    order_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     price_at_time = models.DecimalField(max_digits=10, decimal_places=2)
 
-    def save(self, *args, **kwargs):
-        if not self.order_number:
-            import random
-            import string
-            self.order_number = 'DE-' + ''.join(random.choices(string.digits, k=5))
-        super().save(*args, **kwargs)
-
     def __str__(self):
-        return f"Order #{self.order_number}"
+        return f"{self.menu_item.name} x {self.quantity}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')

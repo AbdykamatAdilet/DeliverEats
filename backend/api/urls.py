@@ -27,4 +27,5 @@ urlpatterns = [
     path('orders/', OrderListAPIView.as_view(), name='order-list'),
     path('orders/<int:pk>/', OrderDetailAPIView.as_view(), name='order-detail'),
     path('admin/', admin.site.urls),
+    path('cart/clear/', views.clear_cart, name='clear-cart'),
 ]

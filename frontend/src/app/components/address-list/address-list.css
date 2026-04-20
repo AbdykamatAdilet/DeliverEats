@@ -1,63 +1,64 @@
 .address-list-container {
-    max-width: 900px;
+    max-width: 920px;
     margin: 0 auto;
-    padding: 100px 24px 40px;
+    padding: 110px 28px 50px;
 }
 
 .list-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
+    margin-bottom: 36px;
     gap: 16px;
+    flex-wrap: wrap;
 }
 
 .list-header h2 {
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 700;
     color: #1a1a2e;
-    margin: 0;
+    letter-spacing: 0.5px;
 }
 
 .btn-add {
-    background:  #dc3545;
+    background: #dc3545;
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 12px 26px;
     border-radius: 40px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s ease;
 }
 
 .btn-add:hover {
-    background:  #dc3545;
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 18px rgba(220, 53, 69, 0.25);
 }
 
 .form-wrapper {
-    margin-bottom: 32px;
-    background: #f9f9f9;
-    border-radius: 16px;
-    padding: 4px;
+    margin-bottom: 36px;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
 }
 
 .loading-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 70px 20px;
     background: white;
-    border-radius: 16px;
+    border-radius: 18px;
 }
 
 .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #f0f0f0;
-    border-top-color:  #dc3545;
+    width: 42px;
+    height: 42px;
+    border: 3px solid #f1f1f1;
+    border-top-color: #dc3545;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
-    margin: 0 auto 16px;
+    margin: 0 auto 18px;
 }
 
 @keyframes spin {
@@ -66,88 +67,96 @@
 
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 70px 20px;
     background: white;
-    border-radius: 16px;
+    border-radius: 18px;
 }
 
 .empty-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
+    font-size: 68px;
+    margin-bottom: 18px;
 }
 
 .empty-state h3 {
-    font-size: 20px;
-    margin-bottom: 8px;
+    font-size: 22px;
+    margin-bottom: 10px;
     color: #1a1a2e;
+    font-weight: 600;
 }
 
 .empty-state p {
-    color: #666;
-    margin-bottom: 24px;
+    color: #777;
+    margin-bottom: 26px;
+    font-size: 14px;
 }
 
 .btn-add-first {
-    background:  #dc3545;
+    background: #dc3545;
     color: white;
     border: none;
-    padding: 12px 28px;
+    padding: 12px 30px;
     border-radius: 40px;
     font-weight: 600;
     cursor: pointer;
+    transition: 0.25s;
+}
+
+.btn-add-first:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(220, 53, 69, 0.25);
 }
 
 .addresses-grid {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 22px;
 }
 
 .address-card {
     background: white;
-    border-radius: 16px;
-    padding: 24px;
-    transition: all 0.2s;
-    border: 1px solid #e0e0e0;
+    border-radius: 18px;
+    padding: 26px;
+    transition: all 0.25s ease;
+    border: 1px solid #ececec;
 }
 
 .address-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
 }
 
 .default-card {
     border: 2px solid #dc3545;
-    background: linear-gradient(135deg, #fff 0%, #fffaf5 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #fff6f6 100%);
 }
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f1f1f1;
 }
 
 .address-type {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .address-icon {
-    font-size: 20px;
+    font-size: 22px;
 }
 
 .type-text {
     font-weight: 600;
-    color: #333;
-    text-transform: capitalize;
+    color: #2c2c2c;
+    font-size: 15px;
 }
 
 .default-badge {
-    background:  #dc3545;
+    background: #dc3545;
     color: white;
     padding: 4px 12px;
     border-radius: 20px;
@@ -156,34 +165,35 @@
 }
 
 .card-body {
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 
 .address-street {
     font-weight: 600;
     color: #1a1a2e;
-    font-size: 16px;
+    font-size: 17px;
     margin-bottom: 8px;
+    letter-spacing: 0.3px;
 }
 
 .address-detail {
-    color: #666;
+    color: #777;
     font-size: 14px;
     margin: 6px 0;
 }
 
 .address-phone {
-    color: #666;
+    color: #555;
     font-size: 14px;
-    margin: 8px 0;
+    margin: 10px 0;
     font-family: monospace;
 }
 
 .address-notes {
-    background: #f9f9f9;
-    padding: 10px 12px;
-    border-radius: 8px;
-    margin-top: 12px;
+    background: #fafafa;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-top: 14px;
     font-size: 13px;
     color: #777;
     font-style: italic;
@@ -192,19 +202,19 @@
 .card-actions {
     display: flex;
     gap: 12px;
-    padding-top: 16px;
-    border-top: 1px solid #f0f0f0;
+    padding-top: 18px;
+    border-top: 1px solid #f1f1f1;
     flex-wrap: wrap;
 }
 
 .card-actions button {
-    padding: 8px 20px;
+    padding: 9px 22px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 13px;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: all 0.25s;
 }
 
 .btn-edit {
@@ -214,6 +224,7 @@
 
 .btn-edit:hover {
     background: #357abd;
+    transform: translateY(-1px);
 }
 
 .btn-default {
@@ -223,6 +234,7 @@
 
 .btn-default:hover {
     background: #1e7e34;
+    transform: translateY(-1px);
 }
 
 .btn-delete {
@@ -232,33 +244,33 @@
 
 .btn-delete:hover {
     background: #c82333;
+    transform: translateY(-1px);
 }
 
 @media (max-width: 640px) {
     .address-list-container {
-        padding: 80px 16px 32px;
+        padding: 90px 16px 32px;
     }
-    
+
     .list-header {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .btn-add {
+        width: 100%;
         text-align: center;
-        justify-content: center;
     }
-    
+
     .address-card {
-        padding: 18px;
+        padding: 20px;
     }
-    
+
     .card-actions {
         flex-direction: column;
     }
-    
+
     .card-actions button {
         width: 100%;
-        text-align: center;
     }
 }

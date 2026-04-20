@@ -16,6 +16,7 @@ export class Home implements OnInit {
   searchText = '';
   activeCategory = '';
   cartCount = 0;
+  cartItems: any[] = [];
   
   categories = [
     { id: 'breakfast', name: 'Breakfast' },
@@ -90,22 +91,33 @@ export class Home implements OnInit {
     if (savedAddress) {
       this.address = savedAddress;
     }
+
     this.loadCartCount();
+    this.loadCartItems();
+
+    window.addEventListener('cart-updated', () => {
+      this.loadCartCount();
+    });
   }
 
   loadCartCount() {
     this.cartService.getCartItems().subscribe({
       next: (response: any) => {
-        if (Array.isArray(response)) {
-          this.cartCount = response.length;
-        } else if (response && response.items) {
-          this.cartCount = response.items.length;
-        } else {
-          this.cartCount = 0;
-        }
+
+          const items =
+          Array.isArray(response) ? response :
+          response?.items ? response.items :
+          [];
+
+        this.cartItems = items;
+
+        this.cartCount = items.reduce((sum: number, item: any) => {
+          return sum + (item.quantity || 0);
+        }, 0);
       },
       error: () => {
         this.cartCount = 0;
+        this.cartItems = [];
       }
     });
   }
@@ -121,22 +133,23 @@ export class Home implements OnInit {
   }
 
   addToCart(item: any) {
-    this.cartService.addToCart(item.id, 1).subscribe({
-      next: () => {
-        this.errorHandler.showSuccess(`${item.name} added to cart!`);
-        this.loadCartCount();
-      },
-      error: (err) => {
-        let errorMsg = 'Failed to add to cart';
-        if (err.status === 401) {
-          errorMsg = 'Please login first';
-          this.router.navigate(['/login']);
-        } else if (err.status === 0) {
-          errorMsg = 'Cannot connect to server';
+    const existing = this.cartItems.find(ci => ci.menu_item?.id === item.id);
+
+    if (existing) {
+      this.cartService.updateQuantity(existing.id, existing.quantity + 1).subscribe({
+        next: () => {
+          this.loadCartItems();
+          this.loadCartCount();
         }
-        this.errorHandler.showError(errorMsg);
-      }
-    });
+      });
+    } else {
+      this.cartService.addToCart(item.id, 1).subscribe({
+        next: () => {
+          this.loadCartItems();
+          this.loadCartCount();
+        }
+      });
+    }
   }
 
   goToCart() {
@@ -168,6 +181,41 @@ export class Home implements OnInit {
     const el = document.getElementById(categoryId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  loadCartItems() {
+    this.cartService.getCartItems().subscribe({
+      next: (response: any) => {
+        console.log('CART ITEMS:', response);
+        this.cartItems = response;
+      },
+      error: (err) => {
+        console.error('Error loading cart:', err);
+      }
+    });
+  }
+
+  getItemQuantity(id: number): number {
+    const item = this.cartItems.find(ci => ci.menu_item?.id === id);
+    return item ? item.quantity : 0;
+  }
+
+  decrease(item: any) {
+    const existing = this.cartItems.find(ci => ci.menu_item?.id === item.id);
+
+    if (!existing) return;
+
+    if (existing.quantity <= 1) {
+      this.cartService.removeItem(existing.id).subscribe(() => {
+        this.loadCartItems();
+        this.loadCartCount();
+      });
+    } else {
+      this.cartService.updateQuantity(existing.id, existing.quantity - 1).subscribe(() => {
+        this.loadCartItems();
+        this.loadCartCount();
+      });
     }
   }
 }

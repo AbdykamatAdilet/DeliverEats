@@ -5,19 +5,15 @@ from django.contrib.auth.models import User
 class CheckoutSerializer(serializers.Serializer):
     address_id = serializers.IntegerField()
     payment_method = serializers.ChoiceField(choices=['card', 'cash', 'kaspi', 'apple_pay'])
-    special_instructions = serializers.CharField(max_length=500, required=False, allow_blank=True)
+    special_instructions = serializers.CharField(required=False, allow_blank=True)
     use_bonuses = serializers.BooleanField(default=False)
-    estimated_delivery_time = serializers.DateTimeField(read_only=True)
 
     def validate_address_id(self, value):
-        request=self.context.get('request')
-        if not Address.objects.filter(id=value, user= request.user).exists():
-            raise serializers.ValidationError("Address does not exist or does not belong to you")
-        return value
-    
-    def validate_payment_method(self,value):
-        if value not in ['card', 'cash', 'kaspi', 'apple_pay']:
-            raise serializers.ValidationError("Invalid payment method")
+        request = self.context.get('request')
+
+        if not Address.objects.filter(id=value, user=request.user).exists():
+            raise serializers.ValidationError("Invalid address")
+
         return value
     
 class AddressSerializer(serializers.ModelSerializer):
@@ -36,23 +32,32 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MenuItemSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name', read_only=True)
+
     class Meta:
         model = MenuItem
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'price', 'category', 'category_name', 'is_available']
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['id', 'order_number', 'status', 'payment_method', 'total_amount', 
-                  'delivery_street', 'delivery_building', 'created_at', 
-                  'special_instructions']
-        read_only_fields = ['id', 'order_number', 'created_at']
+        fields = [
+            'id',
+            'user',
+            'total_amount',
+            'delivery_address',
+            'payment_method',
+            'status',
+            'created_at'
+        ]
+        read_only_fields = ['id', 'user', 'created_at']
         
 class CartItemSerializer(serializers.ModelSerializer):
+    menu_item = MenuItemSerializer(read_only=True)
+
     class Meta:
         model = CartItem
-        fields = ['id', 'cart', 'menu_item', 'quantity']
-        read_only_fields = ['id']
+        fields = ['id', 'menu_item', 'quantity']
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -62,9 +67,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password']
 
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
+        return User.objects.create_user(**validated_data)
 
 class ChangePasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
+    old_password = serializers.CharField()
+    new_password = serializers.CharField()

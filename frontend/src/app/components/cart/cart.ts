@@ -25,6 +25,10 @@ export class CartComponent implements OnInit {
 
   ngOnInit() {
     this.loadCart();
+
+    window.addEventListener('cart-updated', () => {
+      this.loadCart();
+    });
   }
 
   loadCart() {

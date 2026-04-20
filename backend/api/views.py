@@ -1,3 +1,5 @@
+from multiprocessing.managers import Token
+
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
@@ -106,21 +108,40 @@ class CartAPIView(APIView):
         cart, created = Cart.objects.get_or_create(user=request.user)
 
         menu_item_id = request.data.get('menu_item')
-        quantity = request.data.get('quantity', 1)
+        quantity = int(request.data.get('quantity', 1))
 
         menu_item = get_object_or_404(MenuItem, id=menu_item_id)
 
         item, created = CartItem.objects.get_or_create(
             cart=cart,
-            menu_item=menu_item
+            menu_item=menu_item,
+            defaults={'quantity': 0}
         )
 
-        item.quantity += int(quantity)
+        item.quantity += quantity
         item.save()
 
-        return Response({'message': 'Item added to cart'}, status=status.HTTP_201_CREATED)
+        return Response({
+            'message': 'Item added to cart',
+            'cart_items': CartItemSerializer(cart.items.all(), many=True).data
+        }, status=status.HTTP_201_CREATED)
     
-#Function-based view for setting default address
+class LoginView(APIView):
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        user = authenticate(username=username, password=password)
+
+        if user is None:
+            return Response({"error": "Invalid credentials"}, status=401)
+
+        token, _ = Token.objects.get_or_create(user=user)
+
+        return Response({
+            "token": token.key
+        })
+        
 @api_view(['PATCH'])  
 @permission_classes([IsAuthenticated])
 def set_default_address(request, pk):
@@ -152,6 +173,7 @@ def set_default_address(request, pk):
 def get_user_profile(request):
     user = request.user
     return Response({
+        'id': user.id,
         'username': user.username,
         'email': user.email,
         'date_joined': user.date_joined
@@ -167,76 +189,19 @@ def remove_from_cart(request, pk):
     return Response({'message': 'Item removed'}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def process_checkout(request):
-    serializer = CheckoutSerializer(data=request.data, context={'request': request})
-
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    cart = get_object_or_404(Cart, user=request.user)
-    cart_items = cart.items.select_related('menu_item').all()
-
-    if not cart_items.exists():
-        return Response(
-            {'error': 'Your cart is empty.'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    data = serializer.validated_data
-    address = get_object_or_404(Address, id=data['address_id'], user=request.user)
-    total = sum(item.menu_item.price * item.quantity for item in cart_items)
-
-    order = Order.objects.create(
-        user=request.user,
-        total_amount=total,
-        delivery_street=address.street,
-        delivery_building=address.building,
-        delivery_apartment=address.apartment or '',
-        payment_method=data['payment_method'],
-        special_instructions=data.get('special_instructions', ''),
-        status='pending'
-    )
-
-    OrderItem.objects.bulk_create([
-        OrderItem(
-            order=order,
-            menu_item=item.menu_item,
-            quantity=item.quantity,
-            price_at_time=item.menu_item.price,
-        )
-        for item in cart_items
-    ])
-
-    cart_items.delete()
-
-    return Response({
-        'message': 'Order placed successfully!',
-        'order_id': order.id,
-        'order_number': order.order_number,
-        'status': order.status,
-        'total_amount': str(order.total_amount),
-        'estimated_delivery': '30-45 minutes',
-    }, status=status.HTTP_201_CREATED)
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_user_profile(request):
-    user = request.user
-    return Response({
-        'id': user.id,
-        'username': user.username,
-        'email': user.email,
-        'date_joined': user.date_joined
-    })
-
-@api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
     username = request.data.get('username')
     password = request.data.get('password')
-    
+
+    if not username or not password:
+        return Response(
+            {'error': 'Username and password required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     user = authenticate(username=username, password=password)
-    
+
     if user:
         refresh = RefreshToken.for_user(user)
         return Response({
@@ -245,11 +210,59 @@ def login_view(request):
             'user': {
                 'id': user.id,
                 'username': user.username,
-                'email': user.email
             }
         })
-    else:
-        return Response(
-            {'error': 'Invalid credentials'}, 
-            status=status.HTTP_401_UNAUTHORIZED
+
+    return Response({'error': 'Invalid credentials'}, status=401)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def process_checkout(request):
+    serializer = CheckoutSerializer(data=request.data, context={'request': request})
+
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=400)
+
+    cart = get_object_or_404(Cart, user=request.user)
+    cart_items = cart.items.select_related('menu_item').all()
+
+    if not cart_items.exists():
+        return Response({'error': 'Cart is empty'}, status=400)
+
+    data = serializer.validated_data
+    address = get_object_or_404(Address, id=data['address_id'], user=request.user)
+
+    total = sum(item.menu_item.price * item.quantity for item in cart_items)
+
+    order = Order.objects.create(
+        user=request.user,
+        total_amount=total,
+        delivery_address=str(address),
+        payment_method=data['payment_method'],
+        status='pending'
+    )
+
+    OrderItem.objects.bulk_create([
+        OrderItem(
+            order=order,
+            menu_item=i.menu_item,
+            quantity=i.quantity,
+            price_at_time=i.menu_item.price,
         )
+        for i in cart_items
+    ])
+
+    cart_items.delete()
+
+    return Response({
+        'message': 'Order created',
+        'order_id': order.id,
+        'total': str(order.total_amount),
+    }, status=201)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def clear_cart(request):
+    cart = get_object_or_404(Cart, user=request.user)
+    cart.items.all().delete()
+    return Response({'message': 'Cart cleared'}, status=status.HTTP_200_OK)
