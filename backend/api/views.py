@@ -1,3 +1,5 @@
+from tokenize import TokenError
+
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
@@ -191,24 +193,16 @@ def process_checkout(request):
         'total_amount': str(order.total_amount),
         'estimated_delivery': '30-45 minutes',
     }, status=status.HTTP_201_CREATED)
+
 @api_view(['POST'])
-@permission_classes([AllowAny])
-def login_view(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    
-    user = authenticate(username=username, password=password)
-    
-    if user:
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-            'user_id': user.id,
-            'username': user.username
-        })
-    else:
-        return Response(
-            {'error': 'Invalid credentials'}, 
-            status=status.HTTP_401_UNAUTHORIZED
-        )
+@permission_classes([IsAuthenticated])
+def logout_view(request):
+    refresh_token = request.data.get('refresh')
+    if not refresh_token:
+        return Response({'error': 'Refresh token required'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+        return Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
+    except TokenError:
+        return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)

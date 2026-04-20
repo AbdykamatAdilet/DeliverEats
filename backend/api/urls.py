@@ -4,6 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     AddressListCreateAPIView,
     AddressDetailAPIView,
+    logout_view,
     remove_from_cart,
     set_default_address,
     get_user_profile,
@@ -21,4 +22,5 @@ urlpatterns = [
     path('cart/<int:pk>/', remove_from_cart, name='cart-remove'),
     path('login/', TokenObtainPairView.as_view()),
     path('token/refresh/', TokenRefreshView.as_view()),
+    path('logout/', logout_view, name='logout'),
 ]

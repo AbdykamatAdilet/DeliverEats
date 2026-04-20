@@ -27,12 +27,12 @@ export class AuthService {
         console.log('LOGIN RESPONSE:', response);
 
         if (response?.access) {
-          localStorage.setItem('access_token', response.access);
+          localStorage.setItem('access', response.access);
           console.log('Access token saved');
         }
 
         if (response?.refresh) {
-          localStorage.setItem('refresh_token', response.refresh);
+          localStorage.setItem('refresh', response.refresh);
           console.log('Refresh token saved');
         }
       }),
@@ -64,12 +64,12 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
     this.router.navigate(['/login']);
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('access_token');
+    return !!localStorage.getItem('access');
   }
 }

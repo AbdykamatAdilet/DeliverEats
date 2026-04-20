@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from . import views
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     AddressListCreateAPIView,
     AddressDetailAPIView,
@@ -22,7 +23,8 @@ urlpatterns = [
     path('checkout/', process_checkout, name='process-checkout'),
     path('cart/', CartAPIView.as_view(), name='cart'),
     path('cart/<int:pk>/', remove_from_cart, name='cart-remove'),
-    path('login/', views.login_view, name='login'),
+    path('login/', TokenObtainPairView.as_view(), name='login'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('menu/', menu_list),
     path('orders/create/', OrderCreateAPIView.as_view()),
     path('orders/', UserOrdersAPIView.as_view()),
