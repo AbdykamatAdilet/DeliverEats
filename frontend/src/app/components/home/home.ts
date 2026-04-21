@@ -17,103 +17,62 @@ export class Home implements OnInit {
   activeCategory = '';
   cartCount = 0;
   cartItems: any[] = [];
-  
+  address = '';
+  isEditingAddress = false;
+
   categories = [
     { id: 'breakfast', name: 'Breakfast' },
-    { id: 'hot', name: 'Hot Dishes' },
-    { id: 'soup', name: 'Soups' },
-    { id: 'salads', name: 'Salads' },
-    { id: 'sideDish', name: 'Side Dishes' },
-    { id: 'dessert', name: 'Desserts' },
-    { id: 'drinks', name: 'Drinks' }
+    { id: 'hot',       name: 'Hot Dishes' },
+    { id: 'soup',      name: 'Soups' },
+    { id: 'salads',    name: 'Salads' },
+    { id: 'sideDish',  name: 'Side Dishes' },
+    { id: 'dessert',   name: 'Desserts' },
+    { id: 'drinks',    name: 'Drinks' },
   ];
-  
+
   menuItems = [
-    { id: 1, name: 'Omelette', price: 1200, category: 'breakfast' },
-    { id: 2, name: 'Pancakes', price: 850, category: 'breakfast' },
-    { id: 3, name: 'Cottage Cheese', price: 1150, category: 'breakfast' },
-    { id: 4, name: 'Rice Porridge', price: 900, category: 'breakfast' },
-    { id: 5, name: 'Oatmeal', price: 1000, category: 'breakfast' },
-    { id: 6, name: 'Fried Eggs', price: 900, category: 'breakfast' },
-    { id: 7, name: 'Steak', price: 3500, category: 'hot' },
-    { id: 8, name: 'Chicken Steak', price: 2800, category: 'hot' },
-    { id: 9, name: 'Pasta', price: 3200, category: 'hot' },
-    { id: 10, name: 'Lagman', price: 2200, category: 'hot' },
-    { id: 11, name: 'Manti', price: 2000, category: 'hot' },
-    { id: 12, name: 'Beefsteak with Egg', price: 1750, category: 'hot' },
-    { id: 13, name: 'Chicken in White Sauce', price: 2250, category: 'hot' },
-    { id: 14, name: 'Beef Goulash', price: 2150, category: 'hot' },
-    { id: 15, name: 'Fried Fish', price: 2400, category: 'hot' },
-    { id: 16, name: 'Borscht', price: 1000, category: 'soup' },
-    { id: 17, name: 'Rassolnik', price: 800, category: 'soup' },
-    { id: 18, name: 'Solyanka', price: 1200, category: 'soup' },
-    { id: 19, name: 'Pea Soup', price: 900, category: 'soup' },
-    { id: 20, name: 'Kespe', price: 800, category: 'soup' },
-    { id: 21, name: 'Lamb Shurpa', price: 1500, category: 'soup' },
-    { id: 22, name: 'Caesar', price: 1250, category: 'salads' },
-    { id: 23, name: 'Greek', price: 1250, category: 'salads' },
-    { id: 24, name: 'Vinaigrette', price: 1000, category: 'salads' },
-    { id: 25, name: 'Fresh Vegetables', price: 900, category: 'salads' },
-    { id: 26, name: 'Malibu', price: 1250, category: 'salads' },
-    { id: 27, name: 'Olivier Salad', price: 1000, category: 'salads' },   
-    { id: 28, name: 'Rocket Salad', price: 950, category: 'salads' },
-    { id: 29, name: 'Herring under Fur Coat', price: 1000, category: 'salads' },
-    { id: 30, name: 'Mashed Potatoes', price: 850, category: 'sideDish' },
-    { id: 31, name: 'Rice', price: 700, category: 'sideDish' },
-    { id: 32, name: 'Buckwheat', price: 800, category: 'sideDish' },
-    { id: 33, name: 'Pasta', price: 850, category: 'sideDish' },
-    { id: 34, name: 'French Fries', price: 1000, category: 'sideDish' },  
-    { id: 35, name: 'Cheesecake', price: 1500, category: 'dessert' },
-    { id: 36, name: 'Sour Cream Pie', price: 1250, category: 'dessert' },
-    { id: 37, name: 'Honey Cake', price: 1500, category: 'dessert' },
-    { id: 38, name: 'Whoopie Pie', price: 1750, category: 'dessert' },
-    { id: 39, name: 'Napoleon', price: 1350, category: 'dessert' },  
-    { id: 40, name: 'Donut', price: 1000, category: 'dessert' },  
-    { id: 41, name: 'Coca Cola 1L', price: 1000, category: 'drinks' }, 
-    { id: 42, name: 'Sprite 1L', price: 900, category: 'drinks' },  
-    { id: 43, name: 'Fuse 0.5L', price: 600, category: 'drinks' },  
-    { id: 44, name: 'Piko Juice 1L', price: 1250, category: 'drinks' },  
-    { id: 45, name: 'Water 0.5L', price: 500, category: 'drinks' },  
-    { id: 46, name: 'Compote 1L', price: 950, category: 'drinks' }
+    { id: 1,  name: 'Omelette',        price: 1200, category: 'breakfast' },
+    { id: 2,  name: 'Pancakes',        price: 850,  category: 'breakfast' },
+    { id: 3,  name: 'Cottage Cheese',  price: 1150, category: 'breakfast' },
+    { id: 4,  name: 'Rice Porridge',   price: 900,  category: 'breakfast' },
+    { id: 5,  name: 'Oatmeal',         price: 1000, category: 'breakfast' },
+    { id: 6,  name: 'Fried Eggs',      price: 900,  category: 'breakfast' },
+    { id: 7,  name: 'Steak',           price: 3500, category: 'hot' },
+    { id: 8,  name: 'Chicken Steak',   price: 2800, category: 'hot' },
+    { id: 9,  name: 'Pasta',           price: 3200, category: 'hot' },
+    { id: 10, name: 'Lagman',          price: 2200, category: 'hot' },
+    { id: 11, name: 'Plov',            price: 2500, category: 'hot' },
+    { id: 12, name: 'Beshbarmak',      price: 3800, category: 'hot' },
+    { id: 13, name: 'Borsch',          price: 1500, category: 'soup' },
+    { id: 14, name: 'Chicken Soup',    price: 1300, category: 'soup' },
+    { id: 15, name: 'Caesar Salad',    price: 1800, category: 'salads' },
+    { id: 16, name: 'Greek Salad',     price: 1600, category: 'salads' },
+    { id: 17, name: 'Mashed Potatoes', price: 700,  category: 'sideDish' },
+    { id: 18, name: 'French Fries',    price: 800,  category: 'sideDish' },
+    { id: 19, name: 'Cheesecake',      price: 1200, category: 'dessert' },
+    { id: 20, name: 'Ice Cream',       price: 900,  category: 'dessert' },
+    { id: 21, name: 'Green Tea',       price: 500,  category: 'drinks' },
+    { id: 22, name: 'Fresh Juice',     price: 900,  category: 'drinks' },
   ];
-  
-  address: string = '';
-  isEditingAddress: boolean = false;
 
   constructor(
-    private router: Router,
+    private cartService: CartService,
     private errorHandler: ErrorHandlerService,
-    private cartService: CartService
+    private router: Router
   ) {}
 
   ngOnInit() {
-    const savedAddress = localStorage.getItem('address');
-    if (savedAddress) {
-      this.address = savedAddress;
-    }
-
-    this.loadCartCount();
+    const saved = localStorage.getItem('address');
+    if (saved) this.address = saved;
     this.loadCartItems();
-
-    window.addEventListener('cart-updated', () => {
-      this.loadCartCount();
-    });
   }
 
-  loadCartCount() {
+  loadCartItems() {
     this.cartService.getCartItems().subscribe({
       next: (response: any) => {
-
-          const items =
-          Array.isArray(response) ? response :
-          response?.items ? response.items :
-          [];
-
+        const items: any[] = response?.items ?? (Array.isArray(response) ? response : []);
         this.cartItems = items;
-
-        this.cartCount = items.reduce((sum: number, item: any) => {
-          return sum + (item.quantity || 0);
-        }, 0);
+        this.cartCount = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
       },
       error: () => {
         this.cartCount = 0;
@@ -134,27 +93,45 @@ export class Home implements OnInit {
 
   addToCart(item: any) {
     const existing = this.cartItems.find(ci => ci.menu_item?.id === item.id);
-
     if (existing) {
       this.cartService.updateQuantity(existing.id, existing.quantity + 1).subscribe({
-        next: () => {
-          this.loadCartItems();
-          this.loadCartCount();
-        }
+        next: () => this.loadCartItems(),
+        error: () => this.errorHandler.showError('Failed to update cart')
       });
     } else {
       this.cartService.addToCart(item.id, 1).subscribe({
         next: () => {
+          this.errorHandler.showSuccess(`${item.name} added to cart!`);
           this.loadCartItems();
-          this.loadCartCount();
-        }
+        },
+        error: () => this.errorHandler.showError('Failed to add to cart')
       });
     }
   }
 
-  goToCart() {
-    this.router.navigate(['/cart']);
+  decrease(item: any) {
+    const existing = this.cartItems.find(ci => ci.menu_item?.id === item.id);
+    if (!existing) return;
+
+    if (existing.quantity <= 1) {
+      this.cartService.removeItem(existing.id).subscribe({
+        next: () => this.loadCartItems(),
+        error: () => this.errorHandler.showError('Failed to remove item')
+      });
+    } else {
+      this.cartService.updateQuantity(existing.id, existing.quantity - 1).subscribe({
+        next: () => this.loadCartItems(),
+        error: () => this.errorHandler.showError('Failed to update cart')
+      });
+    }
   }
+
+  getItemQuantity(id: number): number {
+    const item = this.cartItems.find(ci => ci.menu_item?.id === id);
+    return item ? item.quantity : 0;
+  }
+
+  goToCart() { this.router.navigate(['/cart']); }
 
   saveAddress() {
     if (this.address.trim()) {
@@ -164,58 +141,17 @@ export class Home implements OnInit {
     }
   }
 
-  editAddress() {
-    this.isEditingAddress = true;
-  }
+  editAddress()  { this.isEditingAddress = true; }
 
   cancelEdit() {
     this.isEditingAddress = false;
-    const savedAddress = localStorage.getItem('address');
-    if (savedAddress) {
-      this.address = savedAddress;
-    }
+    const saved = localStorage.getItem('address');
+    if (saved) this.address = saved;
   }
 
   scrollToCategory(categoryId: string) {
     this.activeCategory = categoryId;
     const el = document.getElementById(categoryId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-
-  loadCartItems() {
-    this.cartService.getCartItems().subscribe({
-      next: (response: any) => {
-        console.log('CART ITEMS:', response);
-        this.cartItems = response;
-      },
-      error: (err) => {
-        console.error('Error loading cart:', err);
-      }
-    });
-  }
-
-  getItemQuantity(id: number): number {
-    const item = this.cartItems.find(ci => ci.menu_item?.id === id);
-    return item ? item.quantity : 0;
-  }
-
-  decrease(item: any) {
-    const existing = this.cartItems.find(ci => ci.menu_item?.id === item.id);
-
-    if (!existing) return;
-
-    if (existing.quantity <= 1) {
-      this.cartService.removeItem(existing.id).subscribe(() => {
-        this.loadCartItems();
-        this.loadCartCount();
-      });
-    } else {
-      this.cartService.updateQuantity(existing.id, existing.quantity - 1).subscribe(() => {
-        this.loadCartItems();
-        this.loadCartCount();
-      });
-    }
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }

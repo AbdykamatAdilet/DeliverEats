@@ -19,18 +19,18 @@ import { CartService } from '../../services/cart.service';
 export class CheckoutComponent implements OnInit {
   addresses: Address[] = [];
   selectedAddressId: number | null = null;
-  paymentMethod: string = 'cash';
-  specialInstructions: string = '';
+  paymentMethod = 'cash';
+  specialInstructions = '';
   isLoading = false;
   cartItems: any[] = [];
   cartTotal = 0;
   deliveryFee = 500;
 
   paymentMethods = [
-    { value: 'card', label: 'Credit/Debit Card', icon: '💳' },
-    { value: 'cash', label: 'Cash on Delivery', icon: '💰' },
-    { value: 'kaspi', label: 'Kaspi.kz', icon: '🏦' },
-    { value: 'apple_pay', label: 'Apple Pay', icon: '📱' }
+    { value: 'card',      label: 'Credit/Debit Card', icon: '💳' },
+    { value: 'cash',      label: 'Cash on Delivery',  icon: '💰' },
+    { value: 'kaspi',     label: 'Kaspi.kz',          icon: '🏦' },
+    { value: 'apple_pay', label: 'Apple Pay',          icon: '📱' },
   ];
 
   constructor(
@@ -56,92 +56,60 @@ export class CheckoutComponent implements OnInit {
           this.selectedAddressId = this.addresses[0].id!;
         }
       },
-      error: () => {
-        this.errorHandler.showError('Failed to load addresses');
-      }
+      error: () => this.errorHandler.showError('Failed to load addresses')
     });
   }
 
   loadCart() {
     this.cartService.getCartItems().subscribe({
-      next: (items: any[]) => {
-        this.cartItems = items;
+      next: (data: any) => {
+        this.cartItems = data?.items ?? (Array.isArray(data) ? data : []);
         this.calculateTotal();
       },
-      error: () => {
-        this.cartTotal = 0;
-      }
+      error: () => { this.cartTotal = 0; this.cartItems = []; }
     });
   }
 
   calculateTotal() {
     this.cartTotal = this.cartItems.reduce((sum, item) => {
-      const price = item.menu_item?.price || 0;
-      const quantity = item.quantity || 0;
-      return sum + (price * quantity);
+      return sum + (parseFloat(item.menu_item?.price) || 0) * (item.quantity || 0);
     }, 0);
   }
 
   getAddressIcon(type: string): string {
-    switch(type) {
-      case 'home': return '🏠';
-      case 'work': return '💼';
-      default: return '📍';
-    }
+    return type === 'home' ? '🏠' : type === 'work' ? '💼' : '📍';
   }
 
   getAddressSummary(address: Address): string {
-    let summary = address.street;
-    if (address.building) summary += `, ${address.building}`;
-    if (address.apartment) summary += `, apt ${address.apartment}`;
-    return summary;
+    let s = address.street;
+    if (address.building) s += `, ${address.building}`;
+    if (address.apartment) s += `, apt ${address.apartment}`;
+    return s;
   }
 
-  getTotalWithDelivery(): number {
-    return this.cartTotal + this.deliveryFee;
-  }
+  getTotalWithDelivery() { return this.cartTotal + this.deliveryFee; }
 
   placeOrder() {
-    if (!this.selectedAddressId) {
-      this.errorHandler.showError('Please select a delivery address');
-      return;
-    }
-
-    if (this.cartItems.length === 0) {
-      this.errorHandler.showError('Your cart is empty');
-      return;
-    }
+    if (!this.selectedAddressId) { this.errorHandler.showError('Please select a delivery address'); return; }
+    if (this.cartItems.length === 0) { this.errorHandler.showError('Your cart is empty'); return; }
 
     this.isLoading = true;
 
-    const checkoutData: CheckoutRequest = {
+    const data: CheckoutRequest = {
       address_id: this.selectedAddressId,
       payment_method: this.paymentMethod as any,
       special_instructions: this.specialInstructions || undefined,
       use_bonuses: false
     };
 
-    this.checkoutService.processCheckout(checkoutData).subscribe({
+    this.checkoutService.processCheckout(data).subscribe({
       next: (response) => {
-        this.errorHandler.showSuccess(
-          `Order #${response.order_id} placed successfully! Total: ${response.total_amount} ₸`
-        );
-        this.cartService.clearCart().subscribe({
-          next: () => {
-            setTimeout(() => {
-              this.router.navigate(['/profile']);
-            }, 2000);
-          },
-          error: () => {
-            setTimeout(() => {
-              this.router.navigate(['/profile']);
-            }, 2000);
-          }
-        });
+        this.errorHandler.showSuccess(`Order #${response.order_id} placed! Total: ${response.total_amount} ₸`);
+        setTimeout(() => this.router.navigate(['/orders']), 2000);
       },
       error: (err) => {
-        const errorMsg = err.error?.error || err.error?.message || 'Failed to place order';
-        this.errorHandler.showError(errorMsg);
+        const msg = err.error?.error || err.error?.message || 'Failed to place order';
+        this.errorHandler.showError(msg);
         this.isLoading = false;
       }
     });

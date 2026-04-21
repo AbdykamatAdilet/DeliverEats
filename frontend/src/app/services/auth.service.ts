@@ -4,29 +4,21 @@ import { Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-
   private apiUrl = 'http://127.0.0.1:8000/api';
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login/`, {
-      username,
-      password
-    }).pipe(
+    return this.http.post(`${this.apiUrl}/login/`, { username, password }).pipe(
       tap((response: any) => {
         localStorage.setItem('access_token', response.access);
         localStorage.setItem('refresh_token', response.refresh);
       }),
       catchError((error: HttpErrorResponse) => {
-        return throwError(() => new Error('Login failed'));
+        const msg = error.error?.error || 'Invalid username or password';
+        return throwError(() => new Error(msg));
       })
     );
   }
@@ -38,14 +30,15 @@ export class AuthService {
 
   getProfile(): Observable<any> {
     return this.http.get(`${this.apiUrl}/profile/`).pipe(
-      catchError((error) => {
-        console.error('PROFILE ERROR:', error);
-        return throwError(() => error);
-      })
+      catchError((error) => throwError(() => error))
     );
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('access');
+    return !!localStorage.getItem('access_token');
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('access_token');
   }
 }

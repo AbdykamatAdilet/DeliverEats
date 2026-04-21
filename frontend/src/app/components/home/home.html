@@ -1,89 +1,82 @@
 <div class="home-container">
-    <div class="address-bar">
-        @if (address && !isEditingAddress) {
-            <div class="address-display">
-                <span class="address-icon">📍</span>
-                <span class="address-text">{{ address }}</span>
-                <button class="btn-edit-address" (click)="editAddress()">Edit</button>
-            </div>
-        }
-        
-        @if (isEditingAddress) {
-            <div class="address-edit">
-                <input type="text" [(ngModel)]="address" placeholder="Enter delivery address" class="address-input">
-                <button class="btn-save-address" (click)="saveAddress()">Save</button>
-                <button class="btn-cancel-address" (click)="cancelEdit()">Cancel</button>
-            </div>
-        }
+  <div class="address-bar">
+    @if (address && !isEditingAddress) {
+      <div class="address-display">
+        <span class="address-icon">📍</span>
+        <span class="address-text">{{ address }}</span>
+        <button class="btn-edit-address" (click)="editAddress()">Edit</button>
+      </div>
+    }
 
-        @if (!address && !isEditingAddress) {
-            <div class="address-empty">
-                <button class="btn-add-address" (click)="editAddress()">Add Delivery Address</button>
-            </div>
+    @if (isEditingAddress) {
+      <div class="address-edit">
+        <input type="text" [(ngModel)]="address" placeholder="Enter delivery address" class="address-input">
+        <button class="btn-save-address" (click)="saveAddress()">Save</button>
+        <button class="btn-cancel-address" (click)="cancelEdit()">Cancel</button>
+      </div>
+    }
+
+    @if (!address && !isEditingAddress) {
+      <div class="address-empty">
+        <button class="btn-add-address" (click)="editAddress()">📍 Add Delivery Address</button>
+      </div>
+    }
+  </div>
+
+  <div class="home-grid">
+    <div class="categories-sidebar">
+      <h3>Categories</h3>
+      <div class="categories-list">
+        @for (cat of categories; track cat.id) {
+          <button
+            class="category-btn"
+            [class.active]="activeCategory === cat.id"
+            (click)="scrollToCategory(cat.id)">
+            {{ cat.name }}
+          </button>
         }
+      </div>
     </div>
 
-    <div class="home-grid">
-        <div class="categories-sidebar">
-            <h3>Categories</h3>
-            <div class="categories-list">
-                @for (cat of categories; track cat.id) {
-                    <button class="category-btn" [class.active]="activeCategory === cat.id" (click)="scrollToCategory(cat.id)">
-                        {{ cat.name }}
+    <div class="menu-content">
+      <div class="search-section">
+        <input type="text" [(ngModel)]="searchText" placeholder="🔍 Search dishes..." class="search-input">
+      </div>
+
+      @for (cat of categories; track cat.id) {
+        @if (getFilteredItemsByCategory(cat.id).length > 0) {
+          <div class="category-section" [id]="cat.id">
+            <h2 class="category-title">{{ cat.name }}</h2>
+            <div class="menu-grid">
+              @for (item of getFilteredItemsByCategory(cat.id); track item.id) {
+                <div class="menu-card">
+                  <h3 class="item-name">{{ item.name }}</h3>
+                  <p class="item-price">{{ item.price }} ₸</p>
+
+                  @if (getItemQuantity(item.id) === 0) {
+                    <button class="btn-add-to-cart" (click)="addToCart(item)">
+                      Add to Cart
                     </button>
-                }
-            </div>
-        </div>
-
-        <div class="menu-content">
-            <div class="search-section">
-                <input type="text" [(ngModel)]="searchText" placeholder="Search dishes..." class="search-input">
-            </div>
-
-            @for (cat of categories; track cat.id) {
-                @if (getFilteredItemsByCategory(cat.id).length > 0) {
-                    <div class="category-section" [id]="cat.id">
-                        <h2 class="category-title">{{ cat.name }}</h2>
-                        <div class="menu-grid">
-                            @for (item of getFilteredItemsByCategory(cat.id); track item.id) {
-                                <div class="menu-card">
-                                    <h3 class="item-name">{{ item.name }}</h3>
-                                    <p class="item-price">{{ item.price }} ₸</p>
-
-                                    @if (getItemQuantity(item.id) === 0) {
-                                        <button class="btn-add-to-cart" (click)="addToCart(item)">
-                                        Add
-                                        </button>
-                                    } @else {
-                                        <div class="qty-control">
-                                        <button (click)="decrease(item)">-</button>
-                                        <span>{{ getItemQuantity(item.id) }}</span>
-                                        <button (click)="addToCart(item)">+</button>
-                                        </div>
-                                    }
-                                </div>
-                                }
-                        </div>
+                  } @else {
+                    <div class="qty-control">
+                      <button class="qty-btn" (click)="decrease(item)">−</button>
+                      <span class="qty-value">{{ getItemQuantity(item.id) }}</span>
+                      <button class="qty-btn" (click)="addToCart(item)">+</button>
                     </div>
-                }
-            }
-        </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
     </div>
+  </div>
 </div>
 
 <div class="cart-fab" (click)="goToCart()">
-    <span class="cart-fab-icon">🛒</span>
-    @if (cartCount > 0) {
-        <span class="cart-fab-badge">{{ cartCount }}</span>
-    }
-</div>
-
-<div class="cart-debug">
-  <h3>Cart items (debug)</h3>
-
-  @for (item of cartItems; track item.id) {
-    <div>
-      {{ item.menu_item?.name }} - {{ item.quantity }}
-    </div>
+  <span class="cart-fab-icon">🛒</span>
+  @if (cartCount > 0) {
+    <span class="cart-fab-badge">{{ cartCount }}</span>
   }
 </div>

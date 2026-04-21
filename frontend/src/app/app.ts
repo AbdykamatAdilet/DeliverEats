@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
-import { AuthService } from './services/auth.service';
-import { ErrorHandlerService } from './services/error-handler.service'; 
+import { RouterOutlet } from '@angular/router';
 import { TopBarComponent } from './components/top-bar/top-bar';
 import { ErrorMessageComponent } from './components/toast/toast';
 
@@ -14,7 +12,4 @@ import { ErrorMessageComponent } from './components/toast/toast';
 })
 export class AppComponent {
   title = 'DeliverEats';
-
-  constructor(private authService: AuthService, private router: Router) {}
-
 }

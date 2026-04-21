@@ -13,9 +13,9 @@ import { ErrorHandlerService } from '../../services/error-handler.service';
 })
 export class CartComponent implements OnInit {
   cartItems: any[] = [];
-  totalAmount: number = 0;
-  deliveryFee: number = 500;
-  isLoading: boolean = false;
+  totalAmount  = 0;
+  deliveryFee  = 500;
+  isLoading    = false;
 
   constructor(
     private cartService: CartService,
@@ -23,29 +23,17 @@ export class CartComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit() {
-    this.loadCart();
-
-    window.addEventListener('cart-updated', () => {
-      this.loadCart();
-    });
-  }
+  ngOnInit() { this.loadCart(); }
 
   loadCart() {
     this.isLoading = true;
     this.cartService.getCartItems().subscribe({
       next: (data: any) => {
-        if (Array.isArray(data)) {
-            this.cartItems = data;
-        } else if (data.items) {
-            this.cartItems = data.items;
-        } else {
-            this.cartItems = [];
-        }
+        this.cartItems = data?.items ?? (Array.isArray(data) ? data : []);
         this.calculateTotal();
         this.isLoading = false;
       },
-      error: (err) => {
+      error: () => {
         this.errorHandlerService.showError('Failed to load cart');
         this.isLoading = false;
       }
@@ -54,60 +42,47 @@ export class CartComponent implements OnInit {
 
   calculateTotal() {
     this.totalAmount = this.cartItems.reduce((acc, item) => {
-      const price = item.menu_item?.price || 0;
-      const quantity = item.quantity || 0;
-      return acc + (price * quantity);
+      return acc + (parseFloat(item.menu_item?.price) || 0) * (item.quantity || 0);
     }, 0);
   }
 
   updateQuantity(item: any, change: number) {
-    const newQuantity = item.quantity + change;
-    if (newQuantity < 1) {
-      this.removeItem(item.id);
-      return;
-    }
-    
-    item.quantity = newQuantity;
+    const newQty = item.quantity + change;
+    if (newQty < 1) { this.removeItem(item.id); return; }
+
+    item.quantity = newQty;   
     this.calculateTotal();
+
+    this.cartService.updateQuantity(item.id, newQty).subscribe({
+      error: () => {
+        item.quantity -= change;  
+        this.calculateTotal();
+        this.errorHandlerService.showError('Failed to update quantity');
+      }
+    });
   }
 
   removeItem(id: number) {
-    if (confirm('Remove this item from cart?')) {
-      this.cartService.removeItem(id).subscribe({
-        next: () => {
-          this.loadCart();
-          this.errorHandlerService.showSuccess('Item removed from cart');
-        },
-        error: () => {
-          this.errorHandlerService.showError('Failed to remove item');
-        }
-      });
-    }
+    if (!confirm('Remove this item from cart?')) return;
+    this.cartService.removeItem(id).subscribe({
+      next: () => { this.errorHandlerService.showSuccess('Item removed'); this.loadCart(); },
+      error: () => this.errorHandlerService.showError('Failed to remove item')
+    });
   }
 
   clearCart() {
-    if (confirm('Clear entire cart?')) {
-      this.cartService.clearCart().subscribe({
-        next: () => {
-          this.loadCart();
-          this.errorHandlerService.showSuccess('Cart cleared');
-        },
-        error: () => {
-          this.errorHandlerService.showError('Failed to clear cart');
-        }
-      });
-    }
+    if (!confirm('Clear entire cart?')) return;
+    this.cartService.clearCart().subscribe({
+      next: () => {
+        this.cartItems  = [];
+        this.totalAmount = 0;
+        this.errorHandlerService.showSuccess('Cart cleared');
+      },
+      error: () => this.errorHandlerService.showError('Failed to clear cart')
+    });
   }
 
-  getTotalWithDelivery(): number {
-    return this.totalAmount + this.deliveryFee;
-  }
+  getTotalWithDelivery() { return this.totalAmount + this.deliveryFee; }
 
-  confirmOrder() {
-    if (this.cartItems.length === 0) {
-      this.errorHandlerService.showError('Your cart is empty');
-      return;
-    }
-    this.router.navigate(['/checkout']);
-  }
+  confirmOrder() { this.router.navigate(['/checkout']); }
 }

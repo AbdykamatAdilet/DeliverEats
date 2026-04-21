@@ -1,7 +1,3 @@
-"""
-Django settings for core project.
-"""
-
 from pathlib import Path
 from datetime import timedelta
 
@@ -20,13 +16,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework.authtoken',
     'corsheaders',
     'api',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', # Должен быть самым первым
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -74,28 +69,37 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
-
 STATIC_URL = 'static/'
 
-# --- CORS CONFIGURATION ---
-CORS_ALLOW_ALL_ORIGINS = True # Для разработки это самый простой вариант
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_METHODS = ['*']
-
+# CORS
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200",
+    'http://localhost:4200',
+    'http://127.0.0.1:4200',
 ]
-
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 CORS_ALLOW_HEADERS = [
-    "authorization",
-    "content-type",
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
 ]
 
-# --- DRF & JWT CONFIGURATION ---
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.autentication.TokenAuthentication',
+        'api.authentication.SoftJWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
@@ -106,6 +110,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True, 
+    'BLACKLIST_AFTER_ROTATION': False,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }

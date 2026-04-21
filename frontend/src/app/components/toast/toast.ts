@@ -12,39 +12,23 @@ import { Subscription } from 'rxjs';
 })
 export class ErrorMessageComponent implements OnInit, OnDestroy {
   message: ErrorMessage | null = null;
-  private subscription: Subscription;
+  private subscription!: Subscription;
 
-  constructor(private errorHandler: ErrorHandlerService) {
+  constructor(private errorHandler: ErrorHandlerService) {}
+
+  ngOnInit() {
     this.subscription = this.errorHandler.errors$.subscribe(msg => {
       this.message = msg;
-      if (msg) {
-        const duration = msg.type === 'success' ? 3000 : 5000;
-        setTimeout(() => {
-          if (this.message === msg) {
-            this.close();
-          }
-        }, duration);
-      }
     });
   }
 
-  ngOnInit() {}
+  close() { this.errorHandler.clear(); }
 
-  close() {
-    this.errorHandler.clear();
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
+  ngOnDestroy() { this.subscription.unsubscribe(); }
 
   getIcon(): string {
     if (!this.message) return '';
-    switch(this.message.type) {
-      case 'success': return '✓';
-      case 'error': return '✗';
-      case 'warning': return '⚠';
-      default: return 'ℹ';
-    }
+    const icons: Record<string,string> = { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' };
+    return icons[this.message.type] || 'ℹ';
   }
 }

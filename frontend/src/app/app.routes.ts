@@ -9,15 +9,15 @@ import { Home } from './components/home/home';
 import { OrdersComponent } from './components/orders/orders.component';
 
 export const routes: Routes = [
-    { path: '', redirectTo: '/menu', pathMatch: 'full' },
-    { path: 'menu', component: Home },
-    { path: 'login', component: LoginComponent },
-    { path: 'cart', component: CartComponent },
-    { path: 'profile', component: ProfileComponent },
-    { path: 'addresses', component: AddressListComponent },
-    { path: 'addresses/new', component: AddressFormComponent },
-    { path: 'addresses/:id', component: AddressFormComponent },
-    { path: 'checkout', component: CheckoutComponent },
-    { path: 'orders', component: OrdersComponent },
-    { path: '**', redirectTo: '/menu' }
+  { path: '', redirectTo: '/menu', pathMatch: 'full' },
+  { path: 'menu', component: Home },
+  { path: 'login', component: LoginComponent },
+  { path: 'cart', component: CartComponent },
+  { path: 'profile', component: ProfileComponent },
+  { path: 'addresses', component: AddressListComponent },
+  { path: 'addresses/new', component: AddressFormComponent },
+  { path: 'addresses/:id', component: AddressFormComponent },
+  { path: 'checkout', component: CheckoutComponent },
+  { path: 'orders', component: OrdersComponent },
+  { path: '**', redirectTo: '/menu' }
 ];

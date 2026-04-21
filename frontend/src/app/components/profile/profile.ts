@@ -39,7 +39,7 @@ export class ProfileComponent implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: () => {
         this.errorHandler.showError('Failed to load profile');
         this.isLoading = false;
       }
@@ -49,14 +49,8 @@ export class ProfileComponent implements OnInit {
   loadOrders() {
     this.isLoadingOrders = true;
     this.orderService.getUserOrders().subscribe({
-      next: (data) => {
-        this.orders = data;
-        this.isLoadingOrders = false;
-      },
-      error: () => {
-        this.orders = [];
-        this.isLoadingOrders = false;
-      }
+      next: (data) => { this.orders = data; this.isLoadingOrders = false; },
+      error: () => { this.orders = []; this.isLoadingOrders = false; }
     });
   }
 
@@ -67,48 +61,27 @@ export class ProfileComponent implements OnInit {
   }
 
   getTotalSpent(): number {
-    return this.orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+    return this.orders.reduce((sum, o) => sum + (parseFloat(o.total_amount) || 0), 0);
   }
 
   getFavoriteRestaurant(): string {
-    if (this.orders.length === 0) return '🍕';
-    const restaurantCount: {[key: string]: number} = {};
-    this.orders.forEach(order => {
-      const name = order.restaurantName || 'DeliverEats';
-      restaurantCount[name] = (restaurantCount[name] || 0) + 1;
-    });
-    const favorite = Object.keys(restaurantCount).reduce((a, b) => 
-      restaurantCount[a] > restaurantCount[b] ? a : b, '');
-    return favorite;
+    return this.orders.length > 0 ? 'DeliverEats' : '🍕';
   }
 
-  editProfile() {
-    this.router.navigate(['/profile/edit']);
-  }
+  viewAllOrders() { this.router.navigate(['/orders']); }
+  editProfile() { this.errorHandler.showError('Profile editing coming soon!'); }
 
-  viewAllOrders() {
-    this.router.navigate(['/orders']);
-  }
-
-  viewOrderDetails(order: any) {
-    this.router.navigate(['/orders', order.id]);
-  }
-
-  goToAddresses() {
-    this.router.navigate(['/addresses']);
-  }
-
-  goToPayment() {
-    this.router.navigate(['/payment-methods']);
-  }
-
-  goToSecurity() {
-    this.router.navigate(['/change-password']);
-  }
+  goToAddresses() { this.router.navigate(['/addresses']); }
+  goToPayment()   { this.errorHandler.showError('Payment methods coming soon!'); }
+  goToSecurity()  { this.errorHandler.showError('Security settings coming soon!'); }
 
   logout() {
     this.authService.logout();
     this.errorHandler.showSuccess('Logged out successfully');
     this.router.navigate(['/login']);
+  }
+
+  viewOrderDetails(order: any) {
+    this.router.navigate(['/orders']);
   }
 }

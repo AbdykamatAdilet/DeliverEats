@@ -1,71 +1,68 @@
 <div class="login-container">
-    <div class="login-card">
-        <div class="login-logo">
-            <div class="logo-icon">🍕</div>
-            <h1>DeliverEats</h1>
-            <p>Welcome back! Login to your account</p>
-        </div>
-
-        <form (ngSubmit)="onLogin()" #loginForm="ngForm">
-            <div class="form-group">
-                <label>Username</label>
-                <div class="input-icon">
-                    <span class="icon">👤</span>
-                    <input 
-                        type="text" 
-                        name="username"
-                        class="form-control"
-                        [(ngModel)]="username" 
-                        placeholder="Enter your username"
-                        required
-                        #usernameInput="ngModel">
-                </div>
-                <div class="error-text" *ngIf="usernameInput.invalid && usernameInput.touched">
-                    Username is required
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Password</label>
-                <div class="input-icon">
-                    <span class="icon"></span>
-                    <input 
-                        type="password" 
-                        name="password"
-                        class="form-control"
-                        [(ngModel)]="password" 
-                        placeholder="Enter your password"
-                        required
-                        #passwordInput="ngModel">
-                </div>
-                <div class="error-text" *ngIf="passwordInput.invalid && passwordInput.touched">
-                    Password is required
-                </div>
-            </div>
-
-            <div class="form-options">
-                <label class="checkbox-label">
-                    <input type="checkbox" [(ngModel)]="rememberMe" name="remember">
-                    <span>Remember me</span>
-                </label>
-                <a href="#" class="forgot-link">Forgot Password?</a>
-            </div>
-
-            <button type="submit" class="btn-login" [disabled]="!loginForm.valid || isLoading">
-                @if (isLoading) {
-                    <span>Logging in...</span>
-                } @else {
-                    <span>Login</span>
-                }
-            </button>
-
-            <div class="divider">
-                <span>OR</span>
-            </div>
-
-            <div class="register-link">
-                Don't have an account? <a routerLink="/register">Sign up</a>
-            </div>
-        </form>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">🍕</div>
+      <h1>DeliverEats</h1>
+      <p>Welcome back! Login to your account</p>
     </div>
+
+    <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+      <div class="form-group">
+        <label>Username</label>
+        <div class="input-icon">
+          <span class="icon">👤</span>
+          <input
+            type="text"
+            name="username"
+            class="form-control"
+            [(ngModel)]="username"
+            placeholder="Enter your username"
+            required
+            #usernameInput="ngModel">
+        </div>
+        @if (usernameInput.invalid && usernameInput.touched) {
+          <div class="error-text">Username is required</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-icon">
+          <span class="icon">🔑</span>
+          <input
+            type="password"
+            name="password"
+            class="form-control"
+            [(ngModel)]="password"
+            placeholder="Enter your password"
+            required
+            #passwordInput="ngModel">
+        </div>
+        @if (passwordInput.invalid && passwordInput.touched) {
+          <div class="error-text">Password is required</div>
+        }
+      </div>
+
+      <div class="form-options">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="rememberMe" name="remember">
+          <span>Remember me</span>
+        </label>
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-message">{{ errorMessage }}</div>
+      }
+
+      <button type="submit" class="btn-login" [disabled]="!loginForm.valid || isLoading">
+        @if (isLoading) { <span>Logging in...</span> } @else { <span>Login</span> }
+      </button>
+
+      <div class="divider"><span>OR</span></div>
+
+      <div class="register-link">
+        Don't have an account? Contact your admin to register.
+      </div>
+    </form>
+  </div>
 </div>

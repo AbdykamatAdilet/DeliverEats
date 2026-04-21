@@ -1,86 +1,71 @@
 <div class="address-list-container">
-    <div class="list-header">
-        <h2>My Addresses</h2>
-        <button class="btn-add" (click)="onAddNewAddress()">
-            + Add New Address
-        </button>
+  <div class="list-header">
+    <h2>My Addresses</h2>
+    <button class="btn-add" (click)="onAddNewAddress()">+ Add New Address</button>
+  </div>
+
+  @if (showAddressForm) {
+    <div class="form-wrapper">
+      <app-address-form
+        [address]="editingAddress"
+        (addressSaved)="onAddressSaved()"
+        (cancel)="onCancelForm()">
+      </app-address-form>
     </div>
+  }
 
-    @if (showAddressForm) {
-        <div class="form-wrapper">
-            <app-address-form 
-                [address]="editingAddress"
-                (addressSaved)="onAddressSaved()"
-                (cancel)="onCancelForm()">
-            </app-address-form>
-        </div>
-    }
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading addresses...</p>
+    </div>
+  }
 
-    @if (isLoading) {
-        <div class="loading-state">
-            <div class="spinner"></div>
-            <p>Loading addresses...</p>
-        </div>
-    }
+  @if (!isLoading && addresses.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">📍</div>
+      <h3>No Addresses Yet</h3>
+      <p>Add your first delivery address to get started</p>
+      <button class="btn-add-first" (click)="onAddNewAddress()">+ Add Your First Address</button>
+    </div>
+  }
 
-    @if (!isLoading && addresses.length === 0) {
-        <div class="empty-state">
-            <div class="empty-icon">📍</div>
-            <h3>No Addresses Yet</h3>
-            <p>Add your first delivery address to get started</p>
-            <button class="btn-add-first" (click)="onAddNewAddress()">
-                + Add Your First Address
-            </button>
-        </div>
-    }
-
-    @if (!isLoading && addresses.length > 0) {
-        <div class="addresses-grid">
-            @for (address of addresses; track address.id) {
-                <div class="address-card" [class.default-card]="address.is_default">
-                    <div class="card-header">
-                        <div class="address-type">
-                            <span class="address-icon">{{ getAddressIcon(address.address_type) }}</span>
-                            <span class="type-text">{{ address.address_type | titlecase }}</span>
-                        </div>
-                        @if (address.is_default) {
-                            <span class="default-badge">Default</span>
-                        }
-                    </div>
-                    
-                    <div class="card-body">
-                        <p class="address-street">{{ address.street }}</p>
-                        <p class="address-detail">
-                            @if (address.building) { Building: {{ address.building }} }
-                            @if (address.apartment) { | Apt: {{ address.apartment }} }
-                        </p>
-                        @if (address.entrance || address.floor) {
-                            <p class="address-detail">
-                                @if (address.entrance) { Entrance: {{ address.entrance }} }
-                                @if (address.floor) { | Floor: {{ address.floor }} }
-                            </p>
-                        }
-                        <p class="address-phone">{{ address.phone_number }}</p>
-                        @if (address.special_instructions) {
-                            <p class="address-notes">📝 {{ address.special_instructions }}</p>
-                        }
-                    </div>
-
-                    <div class="card-actions">
-                        <button class="btn-edit" (click)="onEditAddress(address)">
-                            Edit
-                        </button>
-                        @if (!address.is_default) {
-                            <button class="btn-default" (click)="onSetDefault(address.id!)">
-                                Set Default
-                            </button>
-                        }
-                        <button class="btn-delete" (click)="onDeleteAddress(address.id!)">
-                            🗑️ Delete
-                        </button>
-                    </div>
-                </div>
+  @if (!isLoading && addresses.length > 0) {
+    <div class="addresses-grid">
+      @for (address of addresses; track address.id) {
+        <div class="address-card" [class.default-card]="address.is_default">
+          <div class="card-header">
+            <div class="address-type">
+              <span class="address-icon">{{ getAddressIcon(address.address_type) }}</span>
+              <span class="type-text">{{ address.address_type | titlecase }}</span>
+            </div>
+            @if (address.is_default) {
+              <span class="default-badge">✓ Default</span>
             }
+          </div>
+
+          <div class="card-body">
+            <p class="address-street">{{ address.street }}</p>
+            <p class="address-detail">
+              @if (address.building) { <span>Bld {{ address.building }}</span> }
+              @if (address.apartment) { <span> · Apt {{ address.apartment }}</span> }
+              @if (address.floor) { <span> · Floor {{ address.floor }}</span> }
+            </p>
+            <p class="address-phone">📞 {{ address.phone_number }}</p>
+            @if (address.special_instructions) {
+              <p class="address-notes">📝 {{ address.special_instructions }}</p>
+            }
+          </div>
+
+          <div class="card-actions">
+            @if (!address.is_default) {
+              <button class="btn-set-default" (click)="onSetDefault(address.id!)">Set Default</button>
+            }
+            <button class="btn-edit"   (click)="onEditAddress(address)">Edit</button>
+            <button class="btn-delete" (click)="onDeleteAddress(address.id!)">Delete</button>
+          </div>
         </div>
-    }
+      }
+    </div>
+  }
 </div>

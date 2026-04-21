@@ -1,76 +1,76 @@
 <div class="cart-container">
-    <div class="cart-header">
-        <h1>🛒 Your Cart</h1>
-        <p>Review your order before checkout</p>
+  <div class="cart-header">
+    <h1>🛒 Your Cart</h1>
+    <p>Review your order before checkout</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading...</p>
     </div>
+  }
 
-    @if (isLoading) {
-        <div class="loading-state">
-            <div class="spinner"></div>
-            <p>Loading...</p>
-        </div>
-    }
+  @if (!isLoading && cartItems.length === 0) {
+    <div class="empty-cart">
+      <div class="empty-icon">🛒</div>
+      <h3>Your cart is empty</h3>
+      <p>Add some delicious food to get started</p>
+      <button class="btn-shop" routerLink="/menu">Browse Menu</button>
+    </div>
+  }
 
-    @if (!isLoading && cartItems.length === 0) {
-        <div class="empty-cart">
-            <div class="empty-icon">🛒</div>
-            <h3>Your cart is empty</h3>
-            <p>Add some delicious food to get started</p>
-            <button class="btn-shop" routerLink="/menu">Browse Menu</button>
-        </div>
-    }
-
-    @if (!isLoading && cartItems.length > 0) {
-        <div class="cart-grid">
-            <div class="cart-items">
-                @for (item of cartItems; track item.id) {
-                    <div class="cart-item">
-                        <div class="item-info">
-                            <div class="item-image">🍕</div>
-                            <div class="item-details">
-                                <h3 class="item-name">{{ item.menu_item?.name }}</h3>
-                                <p class="item-price">{{ item.menu_item?.price }} ₸</p>
-                            </div>
-                        </div>
-                        <div class="item-actions">
-                            <div class="quantity-control">
-                                <button class="qty-btn" (click)="updateQuantity(item, -1)">-</button>
-                                <span class="qty-value">{{ item.quantity }}</span>
-                                <button class="qty-btn" (click)="updateQuantity(item, 1)">+</button>
-                            </div>
-                            <div class="item-total">
-                                {{ (item.menu_item?.price || 0) * item.quantity }} ₸
-                            </div>
-                            <button class="remove-btn" (click)="removeItem(item.id)">🗑️</button>
-                        </div>
-                    </div>
-                }
-                
-                <div class="cart-actions-bottom">
-                    <button class="btn-clear" (click)="clearCart()">Clear Cart</button>
-                    <button class="btn-continue" routerLink="/menu">Continue Shopping</button>
-                </div>
+  @if (!isLoading && cartItems.length > 0) {
+    <div class="cart-grid">
+      <div class="cart-items">
+        @for (item of cartItems; track item.id) {
+          <div class="cart-item">
+            <div class="item-info">
+              <div class="item-image">🍕</div>
+              <div class="item-details">
+                <h3 class="item-name">{{ item.menu_item?.name }}</h3>
+                <p class="item-price">{{ item.menu_item?.price }} ₸</p>
+              </div>
             </div>
-
-            <div class="cart-summary">
-                <h3>Order Summary</h3>
-                <div class="summary-row">
-                    <span>Subtotal</span>
-                    <span>{{ totalAmount }} ₸</span>
-                </div>
-                <div class="summary-row">
-                    <span>Delivery Fee</span>
-                    <span>{{ deliveryFee }} ₸</span>
-                </div>
-                <div class="summary-divider"></div>
-                <div class="summary-row total">
-                    <span>Total</span>
-                    <span>{{ getTotalWithDelivery() }} ₸</span>
-                </div>
-                <button class="btn-checkout" (click)="confirmOrder()">
-                    Proceed to Checkout →
-                </button>
+            <div class="item-actions">
+              <div class="quantity-control">
+                <button class="qty-btn" (click)="updateQuantity(item, -1)">−</button>
+                <span class="qty-value">{{ item.quantity }}</span>
+                <button class="qty-btn" (click)="updateQuantity(item, 1)">+</button>
+              </div>
+              <div class="item-total">
+                {{ (item.menu_item?.price || 0) * item.quantity }} ₸
+              </div>
+              <button class="remove-btn" (click)="removeItem(item.id)">🗑️</button>
             </div>
+          </div>
+        }
+
+        <div class="cart-actions-bottom">
+          <button class="btn-clear" (click)="clearCart()">Clear Cart</button>
+          <button class="btn-continue" routerLink="/menu">Continue Shopping</button>
         </div>
-    }
+      </div>
+
+      <div class="cart-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>{{ totalAmount }} ₸</span>
+        </div>
+        <div class="summary-row">
+          <span>Delivery Fee</span>
+          <span>{{ deliveryFee }} ₸</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>{{ getTotalWithDelivery() }} ₸</span>
+        </div>
+        <button class="btn-checkout" (click)="confirmOrder()">
+          Proceed to Checkout →
+        </button>
+      </div>
+    </div>
+  }
 </div>

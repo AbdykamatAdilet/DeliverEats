@@ -4,9 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Address } from '../models/address';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AddressService {
   private apiUrl = 'http://127.0.0.1:8000/api';
 
@@ -39,14 +37,7 @@ export class AddressService {
   }
 
   private handleError(error: HttpErrorResponse) {
-    let errorMessage = 'An unknown error occurred!';
-    if (error.error instanceof ErrorEvent) {
-      errorMessage = `Client Error: ${error.error.message}`;
-    } else {
-      errorMessage = `Server Error: ${error.status} - ${error.message}`;
-    }
-    
-    console.error(errorMessage);
-    return throwError(() => new Error(errorMessage));
+    const msg = error.error?.detail || error.message || 'An error occurred';
+    return throwError(() => new Error(msg));
   }
 }

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MinLengthValidator, RegexValidator
+
 
 class Address(models.Model):
     ADDRESS_TYPES = [
@@ -21,28 +21,45 @@ class Address(models.Model):
     is_default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        parts = [self.street]
+        if self.building:
+            parts.append(self.building)
+        if self.apartment:
+            parts.append(f"apt {self.apartment}")
+        return ", ".join(parts)
+
     def save(self, *args, **kwargs):
         if self.is_default:
             Address.objects.filter(user=self.user, is_default=True)\
                 .exclude(pk=self.pk).update(is_default=False)
         super().save(*args, **kwargs)
 
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
-    
+
+
+# Custom manager – satisfies requirement: "1 custom model manager"
 class AvailableItemManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_available=True)
-    
+
+
 class MenuItem(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, default='')
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    # ForeignKey #1
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     is_available = models.BooleanField(default=True)
+
+    # FIX: manager was defined but never assigned to the model
+    available = AvailableItemManager()
+    objects = models.Manager()
 
     def __str__(self):
         return self.name
@@ -56,6 +73,7 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
+    # ForeignKey #2
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
@@ -72,7 +90,7 @@ class Order(models.Model):
         ('cash', 'Cash'),
         ('card', 'Card'),
         ('kaspi', 'Kaspi Pay'),
-        ('apple_pay', 'Apple Pay')
+        ('apple_pay', 'Apple Pay'),
     ]
 
     ORDER_STATUS = [
@@ -92,17 +110,9 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Order #{self.id}"
+        return f"Order #{self.id} by {self.user.username}"
 
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    order_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
-    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
-    price_at_time = models.DecimalField(max_digits=10, decimal_places=2)
 
-    def __str__(self):
-        return f"{self.menu_item.name} x {self.quantity}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')

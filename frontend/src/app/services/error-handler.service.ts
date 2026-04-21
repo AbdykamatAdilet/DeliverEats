@@ -6,9 +6,7 @@ export interface ErrorMessage {
   type: 'success' | 'error' | 'warning' | 'info';
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ErrorHandlerService {
   private errorSubject = new Subject<ErrorMessage | null>();
   errors$ = this.errorSubject.asObservable();
