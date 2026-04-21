@@ -29,3 +29,16 @@ a { color: inherit; }
 button:focus, input:focus, textarea:focus, select:focus {
   outline: none;
 }
+
+html {
+    touch-action: manipulation;
+}
+
+button, a, input {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+
+* {
+    transition-duration: 0.2s !important;
+}
