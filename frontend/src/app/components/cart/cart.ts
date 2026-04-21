@@ -15,7 +15,7 @@ export class CartComponent implements OnInit {
   cartItems: any[] = [];
   totalAmount  = 0;
   deliveryFee  = 500;
-  isLoading    = false;
+  isLoading    = true;
 
   constructor(
     private cartService: CartService,

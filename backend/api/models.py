@@ -43,7 +43,6 @@ class Category(models.Model):
         return self.name
 
 
-# Custom manager – satisfies requirement: "1 custom model manager"
 class AvailableItemManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_available=True)
@@ -53,11 +52,9 @@ class MenuItem(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, default='')
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    # ForeignKey #1
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     is_available = models.BooleanField(default=True)
 
-    # FIX: manager was defined but never assigned to the model
     available = AvailableItemManager()
     objects = models.Manager()
 
@@ -73,7 +70,6 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    # ForeignKey #2
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)

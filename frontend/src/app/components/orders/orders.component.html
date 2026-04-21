@@ -45,9 +45,7 @@
         <div class="order-card">
           <div class="order-header">
             <div class="order-info">
-              <!-- FIX: was order.orderNumber which doesn't exist; backend sends order.id -->
               <div class="order-number">Order #{{ order.id }}</div>
-              <!-- FIX: was order.date; backend sends order.created_at -->
               <div class="order-date">{{ formatDate(order.created_at) }}</div>
             </div>
             <div class="order-status-badge" [class]="getStatusBadgeClass(order.status)">
@@ -59,20 +57,17 @@
           <div class="order-body">
             <div class="order-restaurant">
               <span class="restaurant-icon">🍕</span>
-              <!-- FIX: was order.restaurantName; hardcoded app name as backend has no restaurant -->
               <span class="restaurant-name">DeliverEats</span>
             </div>
 
             <div class="order-details">
               <div class="detail-item">
-                <!-- FIX: was order.totalAmount; backend sends total_amount -->
                 <span class="detail-text">💰 Total: {{ order.total_amount }} ₸</span>
               </div>
               <div class="detail-item">
                 <span class="detail-text">💳 {{ order.payment_method | titlecase }}</span>
               </div>
               <div class="detail-item">
-                <!-- FIX: was order.delivery_street + order.delivery_building; backend sends delivery_address -->
                 <span class="detail-text">📍 {{ order.delivery_address }}</span>
               </div>
             </div>

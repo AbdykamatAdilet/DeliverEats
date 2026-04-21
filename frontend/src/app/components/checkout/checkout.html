@@ -6,87 +6,95 @@
 
   <div class="checkout-grid">
     <div class="checkout-left">
-      <div class="checkout-section">
-        <h3>📍 Delivery Address</h3>
+      @if (isLoadingAddresses) {
+        <div class="loading-state"><div class="spinner"></div></div>
+      } @else {
+        <div class="checkout-section">
+          <h3>📍 Delivery Address</h3>
 
-        @if (addresses.length === 0) {
-          <div class="no-address">
-            <p>No saved addresses found</p>
-            <button class="btn-link" routerLink="/addresses">+ Add New Address</button>
-          </div>
-        }
+          @if (addresses.length === 0) {
+            <div class="no-address">
+              <p>No saved addresses found</p>
+              <button class="btn-link" routerLink="/addresses">+ Add New Address</button>
+            </div>
+          }
 
-        @for (address of addresses; track address.id) {
-          <div class="address-option" [class.selected]="selectedAddressId === address.id">
-            <label class="address-radio">
-              <input type="radio" name="address" [value]="address.id" [(ngModel)]="selectedAddressId">
-              <div class="address-info">
-                <div class="address-header">
-                  <span class="address-type">
-                    {{ getAddressIcon(address.address_type) }}
-                    {{ address.address_type | titlecase }}
-                  </span>
-                  @if (address.is_default) {
-                    <span class="default-tag">Default</span>
+          @for (address of addresses; track address.id) {
+            <div class="address-option" [class.selected]="selectedAddressId === address.id">
+              <label class="address-radio">
+                <input type="radio" name="address" [value]="address.id" [(ngModel)]="selectedAddressId">
+                <div class="address-info">
+                  <div class="address-header">
+                    <span class="address-type">
+                      {{ getAddressIcon(address.address_type) }}
+                      {{ address.address_type | titlecase }}
+                    </span>
+                    @if (address.is_default) {
+                      <span class="default-tag">Default</span>
+                    }
+                  </div>
+                  <p class="address-street">{{ getAddressSummary(address) }}</p>
+                  <p class="address-phone">📞 {{ address.phone_number }}</p>
+                  @if (address.special_instructions) {
+                    <p class="address-notes">📝 {{ address.special_instructions }}</p>
                   }
                 </div>
-                <p class="address-street">{{ getAddressSummary(address) }}</p>
-                <p class="address-phone">📞 {{ address.phone_number }}</p>
-                @if (address.special_instructions) {
-                  <p class="address-notes">📝 {{ address.special_instructions }}</p>
-                }
-              </div>
-            </label>
-          </div>
-        }
-      </div>
+              </label>
+            </div>
+          }
+        </div>
 
-      <div class="checkout-section">
-        <h3>📝 Special Instructions</h3>
-        <textarea
-          [(ngModel)]="specialInstructions"
-          placeholder="Any special requests? (e.g., no onions, extra sauce, door code...)"
-          rows="3"
-          class="form-control"></textarea>
-      </div>
+        <div class="checkout-section">
+          <h3>📝 Special Instructions</h3>
+          <textarea
+            [(ngModel)]="specialInstructions"
+            placeholder="Any special requests? (e.g., no onions, extra sauce, door code...)"
+            rows="3"
+            class="form-control"></textarea>
+        </div>
+      }
     </div>
 
     <div class="checkout-right">
       <div class="checkout-section">
         <h3>🛒 Order Summary</h3>
 
-        @if (cartItems.length === 0) {
-          <div class="empty-cart">
-            <p>Your cart is empty</p>
-            <button class="btn-menu" routerLink="/menu">Browse Menu</button>
-          </div>
-        }
-
-        <div class="cart-items">
-          @for (item of cartItems; track item.id) {
-            <div class="cart-item">
-              <span class="item-name">{{ item.menu_item?.name }}</span>
-              <span class="item-quantity">x{{ item.quantity }}</span>
-              <span class="item-price">{{ (item.menu_item?.price || 0) * item.quantity }} ₸</span>
+        @if (isLoadingCart) {
+          <div class="loading-state"><div class="spinner"></div></div>
+        } @else {
+          @if (cartItems.length === 0) {
+            <div class="empty-cart">
+              <p>Your cart is empty</p>
+              <button class="btn-menu" routerLink="/menu">Browse Menu</button>
             </div>
           }
-        </div>
 
-        <div class="summary-breakdown">
-          <div class="summary-row">
-            <span>Subtotal:</span>
-            <span>{{ cartTotal }} ₸</span>
+          <div class="cart-items">
+            @for (item of cartItems; track item.id) {
+              <div class="cart-item">
+                <span class="item-name">{{ item.menu_item?.name }}</span>
+                <span class="item-quantity">x{{ item.quantity }}</span>
+                <span class="item-price">{{ (item.menu_item?.price || 0) * item.quantity }} ₸</span>
+              </div>
+            }
           </div>
-          <div class="summary-row">
-            <span>Delivery Fee:</span>
-            <span>{{ deliveryFee }} ₸</span>
+
+          <div class="summary-breakdown">
+            <div class="summary-row">
+              <span>Subtotal:</span>
+              <span>{{ cartTotal }} ₸</span>
+            </div>
+            <div class="summary-row">
+              <span>Delivery Fee:</span>
+              <span>{{ deliveryFee }} ₸</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-row total">
+              <span>Total:</span>
+              <span>{{ getTotalWithDelivery() }} ₸</span>
+            </div>
           </div>
-          <div class="summary-divider"></div>
-          <div class="summary-row total">
-            <span>Total:</span>
-            <span>{{ getTotalWithDelivery() }} ₸</span>
-          </div>
-        </div>
+        }
       </div>
 
       <div class="checkout-section">
@@ -111,7 +119,7 @@
       <button
         class="btn-place-order"
         (click)="placeOrder()"
-        [disabled]="isLoading || addresses.length === 0 || cartItems.length === 0">
+        [disabled]="isLoading || isLoadingAddresses || isLoadingCart || addresses.length === 0 || cartItems.length === 0">
         @if (isLoading) {
           <span>⏳ Processing...</span>
         } @else {

@@ -15,8 +15,8 @@ import { OrderService } from '../../services/order.service';
 export class ProfileComponent implements OnInit {
   user: any = null;
   orders: any[] = [];
-  isLoading = false;
-  isLoadingOrders = false;
+  isLoading = true;
+  isLoadingOrders = true;
 
   constructor(
     private authService: AuthService,
